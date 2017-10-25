@@ -2,38 +2,38 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Kuro Usada ga!</title>
-    <link>https://kurousada.github.io/categories/</link>
+    <link>http://kurousada.ga/categories/</link>
     <description>Recent content in Categories on Kuro Usada ga!</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
     
-	<atom:link href="https://kurousada.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://kurousada.ga/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Disney</title>
-      <link>https://kurousada.github.io/categories/disney/</link>
+      <link>http://kurousada.ga/categories/disney/</link>
       <pubDate>Fri, 20 Oct 2017 11:33:16 +0900</pubDate>
       
-      <guid>https://kurousada.github.io/categories/disney/</guid>
+      <guid>http://kurousada.ga/categories/disney/</guid>
       <description></description>
     </item>
     
     <item>
       <title>TDL</title>
-      <link>https://kurousada.github.io/categories/tdl/</link>
+      <link>http://kurousada.ga/categories/tdl/</link>
       <pubDate>Fri, 26 May 2017 06:01:40 +0900</pubDate>
       
-      <guid>https://kurousada.github.io/categories/tdl/</guid>
+      <guid>http://kurousada.ga/categories/tdl/</guid>
       <description></description>
     </item>
     
     <item>
       <title>TDS</title>
-      <link>https://kurousada.github.io/categories/tds/</link>
+      <link>http://kurousada.ga/categories/tds/</link>
       <pubDate>Fri, 20 Oct 2017 11:33:16 +0900</pubDate>
       
-      <guid>https://kurousada.github.io/categories/tds/</guid>
+      <guid>http://kurousada.ga/categories/tds/</guid>
       <description></description>
     </item>
     
