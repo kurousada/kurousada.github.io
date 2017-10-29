@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tech on Kuro Usada ga!</title>
+    <link>http://kurousada.ga/categories/tech/</link>
+    <description>Recent content in Tech on Kuro Usada ga!</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <lastBuildDate>Sun, 29 Oct 2017 17:25:54 +0900</lastBuildDate>
+    
+	<atom:link href="http://kurousada.ga/categories/tech/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux Mintのログイン画面のテーマを自作する</title>
+      <link>http://kurousada.ga/posts/tech/linux/how-to-create-login-themes-on-linux-mint/</link>
+      <pubDate>Sun, 29 Oct 2017 17:25:54 +0900</pubDate>
+      
+      <guid>http://kurousada.ga/posts/tech/linux/how-to-create-login-themes-on-linux-mint/</guid>
+      <description>&lt;p&gt;Linux Mint のログイン画面は HTML で書くことができます。
+好きな背景を使ったり、いろいろとカスタマイズできるのです。
+今回はそのやり方をご紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

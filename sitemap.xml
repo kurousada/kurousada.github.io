@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://kurousada.ga/posts/tech/linux/how-to-create-login-themes-on-linux-mint/</loc>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/posts/favorites/narcissu/narcissu/</loc>
     <lastmod>2017-10-29T16:56:19+09:00</lastmod>
   </url>
@@ -68,7 +73,19 @@
   
   <url>
     <loc>http://kurousada.ga/</loc>
-    <lastmod>2017-10-29T16:56:19+09:00</lastmod>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/linux/</loc>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/linux-mint/</loc>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -80,7 +97,7 @@
   
   <url>
     <loc>http://kurousada.ga/posts/</loc>
-    <lastmod>2017-10-29T16:56:19+09:00</lastmod>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -98,6 +115,12 @@
   
   <url>
     <loc>http://kurousada.ga/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/tech/</loc>
+    <lastmod>2017-10-29T17:25:54+09:00</lastmod>
     <priority>0</priority>
   </url>
   
