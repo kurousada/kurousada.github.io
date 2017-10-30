@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Kuro Usada ga!</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sun, 29 Oct 2017 17:25:54 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 30 Oct 2017 17:09:43 +0900</lastBuildDate>
     
 	<atom:link href="http://kurousada.ga/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>【無料】Github Pages で独自ドメインを使う</title>
+      <link>http://kurousada.ga/posts/tech/how-to-use-your-original-domain-for-free-with-github-pages/</link>
+      <pubDate>Mon, 30 Oct 2017 17:09:43 +0900</pubDate>
+      
+      <guid>http://kurousada.ga/posts/tech/how-to-use-your-original-domain-for-free-with-github-pages/</guid>
+      <description>&lt;p&gt;このサイトはGithub Pagesを使っています。自分のメモも兼ねて、無料で独自ドメインを取得して Github Pages で使う方法をご紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Linux Mintのログイン画面のテーマを自作する</title>
