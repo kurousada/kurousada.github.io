@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/</loc>
+    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/posts/tech/how-to-use-your-original-domain-for-free-with-github-pages/</loc>
     <lastmod>2017-10-30T17:09:43+09:00</lastmod>
   </url>
@@ -84,7 +89,7 @@
   
   <url>
     <loc>http://kurousada.ga/</loc>
-    <lastmod>2017-10-30T17:09:43+09:00</lastmod>
+    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -108,7 +113,7 @@
   
   <url>
     <loc>http://kurousada.ga/posts/</loc>
-    <lastmod>2017-10-30T17:09:43+09:00</lastmod>
+    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -131,7 +136,7 @@
   
   <url>
     <loc>http://kurousada.ga/categories/tech/</loc>
-    <lastmod>2017-10-30T17:09:43+09:00</lastmod>
+    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
     <priority>0</priority>
   </url>
   
