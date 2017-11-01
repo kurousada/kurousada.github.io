@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://kurousada.ga/posts/disney/disney-food-dogma/</loc>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/</loc>
     <lastmod>2017-10-31T18:44:17+09:00</lastmod>
   </url>
@@ -59,7 +64,7 @@
   
   <url>
     <loc>http://kurousada.ga/categories/disney/</loc>
-    <lastmod>2017-10-20T11:33:16+09:00</lastmod>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -72,6 +77,12 @@
   <url>
     <loc>http://kurousada.ga/categories/favorites/</loc>
     <lastmod>2017-10-30T16:56:19+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/food/</loc>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -89,7 +100,7 @@
   
   <url>
     <loc>http://kurousada.ga/</loc>
-    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -113,19 +124,19 @@
   
   <url>
     <loc>http://kurousada.ga/posts/</loc>
-    <lastmod>2017-10-31T18:44:17+09:00</lastmod>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://kurousada.ga/categories/tdl/</loc>
-    <lastmod>2017-06-15T00:35:19+09:00</lastmod>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://kurousada.ga/categories/tds/</loc>
-    <lastmod>2017-10-20T11:33:16+09:00</lastmod>
+    <lastmod>2017-11-01T12:51:59+09:00</lastmod>
     <priority>0</priority>
   </url>
   
