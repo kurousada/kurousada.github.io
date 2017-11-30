@@ -6,10 +6,22 @@
     <description>Recent content in Linux on Kuro Usada ga!</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sun, 29 Oct 2017 17:25:54 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 01 Dec 2017 03:00:00 +0900</lastBuildDate>
     
 	<atom:link href="http://kurousada.ga/categories/linux/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Goを使ってDLLをクロスコンパイル on Linux</title>
+      <link>http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/</link>
+      <pubDate>Fri, 01 Dec 2017 03:00:00 +0900</pubDate>
+      
+      <guid>http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://mattn.kaoriya.net/&#34;&gt;mattn&lt;/a&gt; さんによる「&lt;a href=&#34;https://mattn.kaoriya.net/software/lang/go/20160921010820.htm&#34;&gt;Golang で Windows の DLL を作る方法&lt;/a&gt;」という記事を参考に、cgo を使って Linux 上で DLL をクロスコンパイルします。
+Go を使えば、Windows なしで&lt;a href=&#34;https://ja.wikipedia.org/wiki/伺か&#34;&gt;伺か&lt;/a&gt;の SHIORI.DLL を作成することができます。ので、作ります。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Linux Mintのログイン画面のテーマを自作する</title>

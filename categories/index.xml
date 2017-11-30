@@ -65,9 +65,18 @@
     </item>
     
     <item>
+      <title>Golang</title>
+      <link>http://kurousada.ga/categories/golang/</link>
+      <pubDate>Fri, 01 Dec 2017 03:00:00 +0900</pubDate>
+      
+      <guid>http://kurousada.ga/categories/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Linux</title>
       <link>http://kurousada.ga/categories/linux/</link>
-      <pubDate>Sun, 29 Oct 2017 17:25:54 +0900</pubDate>
+      <pubDate>Fri, 01 Dec 2017 03:00:00 +0900</pubDate>
       
       <guid>http://kurousada.ga/categories/linux/</guid>
       <description></description>
@@ -112,9 +121,18 @@
     <item>
       <title>Tech</title>
       <link>http://kurousada.ga/categories/tech/</link>
-      <pubDate>Tue, 31 Oct 2017 18:44:17 +0900</pubDate>
+      <pubDate>Fri, 01 Dec 2017 03:00:00 +0900</pubDate>
       
       <guid>http://kurousada.ga/categories/tech/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ukagaka</title>
+      <link>http://kurousada.ga/categories/ukagaka/</link>
+      <pubDate>Fri, 01 Dec 2017 03:00:00 +0900</pubDate>
+      
+      <guid>http://kurousada.ga/categories/ukagaka/</guid>
       <description></description>
     </item>
     
