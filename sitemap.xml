@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/</loc>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/</loc>
     <lastmod>2017-12-01T03:00:00+09:00</lastmod>
   </url>
@@ -120,8 +125,14 @@
   </url>
   
   <url>
+    <loc>http://kurousada.ga/categories/js/</loc>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/</loc>
-    <lastmod>2017-12-01T03:00:00+09:00</lastmod>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -145,7 +156,19 @@
   
   <url>
     <loc>http://kurousada.ga/posts/</loc>
-    <lastmod>2017-12-01T03:00:00+09:00</lastmod>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/python/</loc>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/rl/</loc>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -168,7 +191,7 @@
   
   <url>
     <loc>http://kurousada.ga/categories/tech/</loc>
-    <lastmod>2017-12-01T03:00:00+09:00</lastmod>
+    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
     <priority>0</priority>
   </url>
   

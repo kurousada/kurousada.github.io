@@ -32,7 +32,7 @@
 
 
 
-<meta property="og:updated_time" content="2017-12-01T03:00:00&#43;09:00"/>
+<meta property="og:updated_time" content="2018-01-02T23:19:16&#43;09:00"/>
 
 
 
@@ -199,6 +199,10 @@ ga('send', 'pageview');
 
                 
                     <li>
+                        <a href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/"><p>ローグライクのターン制ゲームループ</p></a>
+                    </li>
+                
+                    <li>
                         <a href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/"><p>Goを使ってDLLをクロスコンパイル on Linux</p></a>
                     </li>
                 
@@ -212,10 +216,6 @@ ga('send', 'pageview');
                 
                     <li>
                         <a href="http://kurousada.ga/posts/disney/disney-food-dogma/"><p>ディズニー・フードの鉄則</p></a>
-                    </li>
-                
-                    <li>
-                        <a href="http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/"><p>オフラインでも懐かしいあの頃に戻る方法</p></a>
                     </li>
                 
             </ul>
@@ -232,10 +232,10 @@ ga('send', 'pageview');
     <header>
     <div class="title">
         
-            <h2><a href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/">Goを使ってDLLをクロスコンパイル on Linux</a></h2>
+            <h2><a href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/">ローグライクのターン制ゲームループ</a></h2>
         
         
-            <p>Cross Compile Dll Using Golang on Linux</p>
+            <p>A turn based gameloop for roguelikes.</p>
         
     </div>
     <div class="meta">
@@ -246,13 +246,13 @@ ga('send', 'pageview');
             
         
 
-        <time class="published" datetime='2017-12-01'>
-            December 1, 2017
+        <time class="published" datetime='2018-01-02'>
+            January 2, 2018
         </time>
         
         <span class="author">Kuro Usada</span>
         
-            <p>16 minute read</p>
+            <p>12 minute read</p>
         
         
     </div>
@@ -282,15 +282,15 @@ ga('send', 'pageview');
     
 
     <span class="image featured">
-        <img class="featured-data" src="http://kurousada.ga/img/2017/12/cross-compile-dll-using-golang-on-linux/featured" alt="Go Gopher by Renee French" onerror="this.classList.add('on-error')" />
+        <img class="featured-data" src="http://kurousada.ga/img/2018/01/a-turn-based-gameloop-for-roguelikes/featured" alt="変愚蛮怒 by Hengband Dev Team" onerror="this.classList.add('on-error')" />
         <span class="featured-alt">Not found</span>
     </span>
     <p class="featured-copyright">
         
             
-                <a href="https://blog.golang.org/gopher" target="_blank">
+                <a href="http://hengband.osdn.jp/" target="_blank">
             
-            Go Gopher
+            変愚蛮怒
             
                 </a>
             
@@ -298,11 +298,7 @@ ga('send', 'pageview');
         
             &nbsp;by&nbsp;
             
-                <a href="http://reneefrench.blogspot.com/" target="_blank">
-            
-            Renee French
-            
-                </a>
+            Hengband Dev Team
             
         
     </p>
@@ -313,504 +309,654 @@ ga('send', 'pageview');
 <ul>
 <li>
 <ul>
-<li><a href="#必要なもの">必要なもの</a></li>
-<li><a href="#全体の流れ">全体の流れ</a></li>
-<li><a href="#とりあえず作ってみる">とりあえず作ってみる</a></li>
-<li><a href="#もうちょっと詳しく">もうちょっと詳しく</a></li>
-<li><a href="#伺かの-shiori-を作る">伺かの SHIORI を作る</a>
+<li><a href="#roguelike-とはどんな食べ物なのか">Roguelike とはどんな食べ物なのか</a></li>
+<li><a href="#ゲームループの実装方針">ゲームループの実装方針</a>
 <ul>
-<li><a href="#伺かとは">伺かとは</a></li>
-<li><a href="#ソース">ソース</a></li>
-<li><a href="#コンパイルと実行">コンパイルと実行</a></li>
+<li><a href="#スピードの概念があるターン制">スピードの概念があるターン制</a></li>
+<li><a href="#プレイヤーと-npc-は同じように扱う">プレイヤーと NPC は同じように扱う</a></li>
+<li><a href="#ロジックと-ui-の分離">ロジックと UI の分離</a></li>
+<li><a href="#npc-の-ai-は差し替え可能にする">NPC の AI は差し替え可能にする</a></li>
 </ul></li>
-<li><a href="#その他ハマりポイントとか-tips-とか">その他ハマりポイントとか Tips とか</a>
-<ul>
-<li><a href="#wine上でのファイルパーミッションとfat32">Wine上でのファイルパーミッションとFAT32</a></li>
-<li><a href="#writefile-のエンコーディング">WriteFile()のエンコーディング</a></li>
-<li><a href="#go-と-c-の橋渡し">Go と C の橋渡し</a></li>
-<li><a href="#c-の関数の返り値">C の関数の返り値</a></li>
-<li><a href="#c-の関数を定義したい">C の関数を定義したい！</a></li>
-<li><a href="#const-の-go-世界での型はどうすればいいんですか">const の Go 世界での型はどうすればいいんですか？</a></li>
-<li><a href="#struct-や-interface-は-union-は">struct や interface は？ union は？</a></li>
-<li><a href="#go-build-x">go build -x</a></li>
-</ul></li>
+<li><a href="#よくあるゲームループ">よくあるゲームループ</a></li>
+<li><a href="#更新と描画を非同期っぽくする">更新と描画を非同期っぽくする</a></li>
+<li><a href="#行動を抽象化する">行動を抽象化する</a></li>
+<li><a href="#ai-も抽象化して差し替え可能に">AI も抽象化して差し替え可能に</a></li>
+<li><a href="#プレイヤーの入力を-actor-に注入する">プレイヤーの入力を actor に注入する</a></li>
+<li><a href="#メインループを勝手に弄れないとき">メインループを勝手に弄れないとき</a></li>
+<li><a href="#ターン制ゲームにおけるスピードの実装">ターン制ゲームにおけるスピードの実装</a></li>
+<li><a href="#action-をもっと柔軟に">Action をもっと柔軟に</a></li>
 <li><a href="#まとめ">まとめ</a></li>
 </ul></li>
 </ul>
 </nav>
-        <p><a href="https://mattn.kaoriya.net/">mattn</a> さんによる「<a href="https://mattn.kaoriya.net/software/lang/go/20160921010820.htm">Golang で Windows の DLL を作る方法</a>」という記事を参考に、cgo を使って Linux 上で DLL をクロスコンパイルします。
-Go を使えば、Windows なしで<a href="https://ja.wikipedia.org/wiki/伺か">伺か</a>の SHIORI.DLL を作成することができます。ので、作ります。</p>
+        <p>新年あけましておめでとうございます。
+本当はクリスマスに Roguelike をリリースしたかったんですが色々あって大幅に遅れ、いつの間にか新年になってました。
+完成まで待つといつになるかわからないので、ソース以外の日本語情報が少ないターン制ゲームループの実装について書きます。
+ブラウザでもデスクトップでも大丈夫です。</p>
 
 <p></p>
 
-<p>この記事は <a href="https://qiita.com/advent-calendar/2017/go4">Go Advent Calender 2017（その4）</a> の 1日目の記事です。</p>
+<p><del>パク</del> 参考にしたのは「<a href="http://gameprogrammingpatterns.com/">Game Programming Patterns</a>」という本と、その著者 Bob Nystrom さんのブログ記事である「<a href="http://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/">A Turn-Based Game Loop</a>」です。
+Nystrom さんの本やブログは必見の価値有りです（本も Web で全文公開されています）。
+なんならこの記事読まなくても参考元の記事を読めば書けます。</p>
 
-<p>2日目は <a href="https://qiita.com/kami_zh">kami_zh</a> さんによる「<a href="https://qiita.com/kami_zh/items/ff636f15da87dabebe6c">Goで標準出力をテストする方法</a>」です。</p>
+<h2 id="roguelike-とはどんな食べ物なのか">Roguelike とはどんな食べ物なのか</h2>
 
-<p>この記事で作成する SHIORI を基に、もうちょっと機能的にしたサンプルゴーストを作りました：<a href="https://github.com/kurousada/gohst/">github.com/kurousada/gohst</a></p>
+<p><strong>食べ物ではありません。</strong></p>
 
-<h2 id="必要なもの">必要なもの</h2>
+<p>コンピュータゲームの一種で、ジャンルは RPG に属します。
+元々は Unix 向けのコンソールゲームである「Rogue（ローグ）」が持つ特徴を備えた「Rogue-like Games（ローグのようなゲーム）」の総称であり、ジャンル名とも言えます。</p>
 
-<ul>
-<li>Linux PC</li>
-<li><a href="https://golang.org/">Go</a> （たぶん）1.5以上</li>
-<li><a href="http://www.mingw.org/">MinGW</a></li>
-<li><a href="https://www.winehq.org/">Wine</a>（伺かベースウェアの<a href="http://ssp.shillest.net/">SSP</a> を動かすためです。SSP を使わないなら要りません）</li>
-</ul>
-
-<p>この記事は以下の環境で作成しています。</p>
+<p>Rogue には、以下のような特徴があります。</p>
 
 <ul>
-<li><a href="https://linuxmint.com/">Linux Mint</a> 18.2 Sonya Xfce 64bit</li>
-<li>Go 1.9.2 linux/amd64 via <a href="https://github.com/syndbg/goenv">goenv</a></li>
-<li>mingw-w64 4.0.4-2 via <code>apt install mingw-w64</code> (gcc のバージョンは 5.3.1 です)</li>
-<li>wine-1.6.2 via <code>apt install wine</code></li>
+<li>剣と魔法の世界のシングルプレイヤー RPG である。</li>
+<li>リアルタイムではなくターン制で、キャラクタのスピードによって行動順が割り当てられる。</li>
+<li>ダンジョンを徘徊しながら階段を見つけてひたすら下っていくゲームで、各階のマップは毎回自動で生成される。</li>
+<li>セーブはゲーム中断のためにしか用意されておらず、一度死んだらキャラの作成からやり直し。</li>
+<li>アイテムの多くは未鑑定状態で、鑑定して初めてどんなアイテムかわかる。</li>
+<li>食料を食べられず空腹になると死ぬ。</li>
+<li>キーボードで操作し、キーの一つ一つに行動が割り当てられている。</li>
+<li>コンソールゲームだが、Curses ライブラリを使ってグラフィカルな表現に近い UI を持つ。</li>
+<li>マップでは ASCII 文字がプレイヤーや通路、壁、アイテム、モンスターなどを表す（下図）。</li>
 </ul>
 
-<h2 id="全体の流れ">全体の流れ</h2>
+<pre><code>                              ------------
+                              |.....!....|
+                              |..@.......|
+            ##################+.........:|
+            #                 |...%.H....|
+            #                 ------+-----
+            #
+         ---+---
+         |.....|
+         |.?...|
+         |.....+######        ---------+----
+         -------     #        |............|
+                     #        |............+
+                     #########+..........^.|
+                              |............|
+                              --------------
+</code></pre>
 
-<p>基本的な流れは「<a href="https://mattn.kaoriya.net/software/lang/go/20160921010820.htm">Golang で Windows の DLL を作る方法</a>」と同じです。</p>
+<p>しかしこの Rogue が大変おもしろかったため、「<a href="https://www.nethack.org/">NetHack</a>」や「<a href="http://rephial.org/">Angband</a>」など色々な亜種が生まれ、Roguelike と名乗るゲームが数多くできました。
+元になった Rogue は様々な特徴を持っていたので、どんなゲームが Roguelike なのかという定義については議論の余地があります。
+詳しくは「<a href="http://2dgames.jp/2015/03/19/roguelike/">ローグライクの定義まとめ – 2dgames.jp</a>」を参照してください。</p>
 
-<ol>
-<li>MinGW の GCC を環境変数<code>CC</code>に指定して<code>go build --buildmode=c-archieve</code>で<code>libxxx.a</code>を作る</li>
-<li>defファイルを作る</li>
-<li>MinGW の GCC で<code>-Wl,--allow-multiple-definition</code>を指定して DLL を作る</li>
-</ol>
+<p>一言で言うと「やったことないなら、やってくさだい」です。</p>
 
-<p>なお、Linux ネイティブの GCC ではなく、<strong>MinGW の GCC を使う</strong>ことに注意してください。</p>
+<h2 id="ゲームループの実装方針">ゲームループの実装方針</h2>
 
-<h2 id="とりあえず作ってみる">とりあえず作ってみる</h2>
+<p>「こんな感じにしたいけど、設計はどうすればいいんだろう……」と悩んでたら上述の記事にまさにその通りな設計が書いてありました。</p>
 
-<p>DLL といえば<a href="https://ja.wikipedia.org/wiki/伺か">伺か</a>の SHIORI（shiori.dll）ですね！
-（え、伺かを「知らない」……？それは……）</p>
+<h3 id="スピードの概念があるターン制">スピードの概念があるターン制</h3>
 
-<p>mattn さんも「<a href="https://qiita.com/mattn/items/b7889e3c036b408ae8bd">本物の golang を&hellip; 本物の Gopher を、お見せしますよ。</a>」という記事で Pure Go の伺かベースウェア（のようなもの）を実装されてましたし！</p>
+<p>ただのターン制では、プレイヤーが 1歩動くとモンスターも 1歩動きます。
+例外なく同じ順序で、誰もが同じスピードです。</p>
 
-<p><a href="http://ssp.shillest.net/ukadoc/manual/spec_dll.html">SHIORI/3.0 の仕様</a>によると、<code>shiori.dll</code>は以下の3つの関数をエクスポートする必要があります。
-（伺か？SHIORI？知らねーよ！！って方には後で説明するので、とりあえず下の 3つの関数をエクスポートした DLL を作るんだということを了解していただければと思います）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">extern</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">__declspec</span>(dllexport) BOOL <span style="color:#66d9ef">__cdecl</span> load(HGLOBAL h, <span style="color:#66d9ef">long</span> len);
-<span style="color:#66d9ef">extern</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">__declspec</span>(dllexport) BOOL <span style="color:#66d9ef">__cdecl</span> unload(<span style="color:#66d9ef">void</span>);
-<span style="color:#66d9ef">extern</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">__declspec</span>(dllexport) HGLOBAL <span style="color:#66d9ef">__cdecl</span> request(HGLOBAL h, <span style="color:#66d9ef">long</span> <span style="color:#f92672">*</span>len);</code></pre></div>
-<p>まずは引数なしで何もしない<code>unload()</code>関数を Go で書いてエクスポートしてみましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<p>しかしこれではつまらないので、スピードの概念を導入します。
+スピードが早いキャラクターほど多くの行動を取ることができ、プレイヤーが 1歩動く→モンスターが 2歩動く→プレイヤーが 1歩動く→モンスターが 3歩動く、といった感じになります。</p>
 
-<span style="color:#75715e">/* 
-</span><span style="color:#75715e">   #include &lt;windows.h&gt;
-</span><span style="color:#75715e"> */</span>
-<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;C&#34;</span>
+<h3 id="プレイヤーと-npc-は同じように扱う">プレイヤーと NPC は同じように扱う</h3>
 
-<span style="color:#f92672">import</span> (
-    <span style="color:#e6db74">&#34;fmt&#34;</span>
-)
+<p>Roguelike、特に私が大好きな「<a href="http://ylvania.org/jp/elona">Elona</a>」は超自由度が高いゲームです（Elona についてはまた今度書きます）。
+「ゼルダの伝説 ブレス オブ ザ ワイルド」よりもできることが多いんじゃないかというぐらいの自由度です（ゼルダはプレイしたことないです）。</p>
 
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>(){}
+<p>薬を飲んだり杖を振ったりといった行動をプレイヤーと NPC で共通化できれば、労力が少なくてすむはずです。</p>
 
-<span style="color:#75715e">//export unload
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">unload</span>() <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">BOOL</span> {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">TRUE</span>
-}</code></pre></div>
-<p>この<code>main.go</code>をコンパイルして<code>libshiori.a</code>を作ります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> GOOS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;windows&#34;</span> GOARCH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;386&#34;</span> CC<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;i686-w64-mingw32-gcc-win32&#34;</span> go build -buildmode<span style="color:#f92672">=</span>c-archive -o libshiori.a</code></pre></div>
-<p><code>libshiori.a</code>の中から<code>unload()</code>をエクスポートするための<code>shiori.def</code>ファイルを書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-def" data-lang="def">LIBRARY	shiori
+<h3 id="ロジックと-ui-の分離">ロジックと UI の分離</h3>
 
-EXPORTS
-    unload</code></pre></div>
-<p>で、この<code>shiori.def</code>と<code>libshiori.a</code>を基に<code>shiori.dll</code>を作ります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">i686-w64-mingw32-gcc-win32 -shared -o shiori.dll shiori.def libshiori.a -Wl,--allow-multiple-definition -static -lstdc++ -lwinmm -lntdll -lws2_32</code></pre></div>
-<p><code>shiori.dll</code>ができました！
-オブジェクトファイルに含まれるシンボルを教えてくれる<code>nm</code>コマンドで確認してみます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ nm shiori.dll | grep unload
-6bad70d0 T __cgoexp_637397f8f89c_unload
-6b9c1500 T _unload
-6bad7110 T main._cgoexpwrap_637397f8f89c_unload
-6bad7590 T main.unload</code></pre></div>
-<p>ちゃんと<code>_unload</code>がエクスポートされてます。
-やったー！</p>
+<p>今回作っているローグライクは、コンソールベースではなく Elona のような GUI にしたいと考えていました。
+しかし昔ながらのコンソールも捨てがたいし……というわけで、ロジックと UI を分離します。</p>
 
-<p>おそらく<code>main.unload</code>が Go の関数、<code>_unload</code>は cgo が出力したラッパ関数で、この<code>_unload</code>から<code>main.unload</code>が呼ばれることでGoの関数が実行されるんじゃないかな〜（このへん曖昧）。</p>
+<p>コンソールベースの UI は curses 一択ですが、GUI ライブラリは「SDL」「SFML」「OpenGL」などいくらでもあり、選択に迷います。
+ロジックと UI を分離することで、UI 部分が依存する GUI ライブラリのメンテナンスが止まっても労力が少なくて済みます。</p>
 
-<h2 id="もうちょっと詳しく">もうちょっと詳しく</h2>
+<h3 id="npc-の-ai-は差し替え可能にする">NPC の AI は差し替え可能にする</h3>
 
-<p>上のコードを見て、「<strong>GCC を MinGW のやつにしただけじゃんwww</strong>」という Go 強者の方は以上です。
-お疲れ様でした。</p>
+<p>NPC の行動戦略を決定する AI は差し替え可能にしたいです。
+NPC をペットとして動かすことができるようにしたいのですが、その時に行動戦略も指示することができると楽しいです。</p>
 
-<p>以下、「なんとなくわかるけどもうちょい詳しく！」というあなた（わたし）のために順を追って説明します。</p>
+<h2 id="よくあるゲームループ">よくあるゲームループ</h2>
 
-<p>Go でライブラリを作るときには <strong>cgo</strong> という、Go から C を呼んだり C から Go を呼んだりする機能を使います。
-cgo がソースの一部を C のコードに変換、GCC でコンパイルして Go のコードとリンクすることにより、 Go で C のコードっぽいものを書くことができるようになります。</p>
+<p>今書いているのが Python 3.6 なので、サンプルは Python 3.6 で書きます（実際のコードとは異なります）。</p>
 
-<p>それではソースを追っていきましょう。
-冒頭にいきなり大事なポイントです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span></code></pre></div>
-<p>コンパイルするにはパッケージ<code>main</code>と<code>main()</code>関数が必要です。
-これはたぶん GO コードをコンパイルするときは必ず必要なんじゃないかと思ってます。</p>
+<p>さて、まずはよくあるゲームループを見てみましょう（ブラウザは特殊なので、対応はもう少し先です）。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">pass</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">pass</span>
 
-<p>さて、パッケージ宣言の後、一番最初のコメント部分を <strong>preamble</strong> と呼びます。
-「序文」とでも訳せましょうか、この部分に書いた C コードは cgo によって抽出されて GCC でコンパイルされるときにファイルの先頭にくっつけられます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#75715e">/* 
-</span><span style="color:#75715e">   #include &lt;windows.h&gt;
-</span><span style="color:#75715e"> */</span></code></pre></div>
-<p>で、その preamble の後に<code>import &quot;C&quot;</code>です。
-これは「C パッケージをインポートして cgo 使うよ〜」って感じの宣言です（たぶん）。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors <span style="color:#f92672">=</span> []):
+        self<span style="color:#f92672">.</span>actors  <span style="color:#f92672">=</span> actors
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            self<span style="color:#f92672">.</span>handle_input()
+            self<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>update()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>draw()
 
-<p>ここで大事なポイント2つ目。</p>
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<p>このゲームループではゲームのロジックと UI の分離があまりなされていません。
+<code>Actor</code> クラスがゲームロジックも描画も司っています。</p>
 
-<p>preamble と<code>import &quot;C&quot;</code>の間に<strong>空行を入れてはいけません</strong>！
-つまり、以下のコードはダメです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<p>そこで、<code>Game</code> オブジェクトからゲームロジックを担当する <code>World</code> クラスを切り出します。
+そしてこの <code>World</code> クラスを <code>Game</code> クラスが持つようにし、UI から <code>World</code> の更新を進めるようにします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Sprite</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actor):
+        self<span style="color:#f92672">.</span>actor <span style="color:#f92672">=</span> actor
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">pass</span>
 
-<span style="color:#75715e">/* 
-</span><span style="color:#75715e">   #include &lt;windows.h&gt;
-</span><span style="color:#75715e"> */</span>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">pass</span>
 
-<span style="color:#75715e">// フリーダムなオレは、ここに空行を入れちゃうぜぇ〜
-</span><span style="color:#75715e"></span>
-<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;C&#34;</span></code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> GOOS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;windows&#34;</span> GOARCH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;386&#34;</span> CC<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;i686-w64-mingw32-gcc-win32&#34;</span> go build -buildmode<span style="color:#f92672">=</span>c-archive -o libshiori.a
-<span style="color:#75715e"># command-line-arguments
-</span><span style="color:#75715e"></span>./main.go:19:15: could not determine kind of name <span style="color:#66d9ef">for</span> C.BOOL
-./main.go:20:12: could not determine kind of name <span style="color:#66d9ef">for</span> C.TRUE</code></pre></div>
-<p>怒られます。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>world   <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>sprites <span style="color:#f92672">=</span> {}
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            self<span style="color:#f92672">.</span>handle_input()
+            self<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>update()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>actors:
+            sprite <span style="color:#f92672">=</span> Sprite(actor)
+            sprite<span style="color:#f92672">.</span>draw()
 
-<p>さて、<code>fmt</code>など必要なパッケージもインポートしたら、<code>main()</code>を書いておきます。
-これはもちろん<code>main</code>パッケージ内ならどこでもいいです。
-中身は空で、何もしません。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> actors
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>update()
 
-<p>やっと真打登場です。
-<code>unload()</code>を書きます。
-このとき、エクスポートしたい関数の直前に<code>//export 関数名</code>と書くとエクスポートされますので、書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#75715e">//export unload
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">unload</span>() <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">BOOL</span> {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">TRUE</span>
-}</code></pre></div>
-<p>そして、大事なポイント3つ目。</p>
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<h2 id="更新と描画を非同期っぽくする">更新と描画を非同期っぽくする</h2>
 
-<p><code>//export</code>の<code>//</code>と<code>export</code>の間に<strong>空白を入れてはいけません！</strong></p>
+<p><code>World.update()</code> ではすべての actor を一度に処理していました。
+しかし、actor が増えて更新処理が遅れると描画処理にも遅れが生じ、非常に嫌なことになります。</p>
 
-<p>これにめっちゃハマってしまい、2時間くらい無駄にしました。
-エラーは出ず、ただエクスポートされなくなるだけなので原因を特定するのがかなり厳しいです。
-お気をつけ下さい。</p>
+<p>そこで、更新処理をより細かいステップにして、一定の時間が経つまでできるだけ呼び出した後、描画処理を呼び出すことにしましょう。</p>
 
-<p>肝心の関数ですが、C における<code>unload()</code>のプロトタイプは以下です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">extern</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">__declspec</span>(dllexport) BOOL <span style="color:#66d9ef">__cdecl</span> unload(<span style="color:#66d9ef">void</span>);</code></pre></div>
-<p>これを Go の関数にするとこうなります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">unload</span>() <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">BOOL</span></code></pre></div>
-<p>C パッケージをインポートしたので、C の世界の値を使うことができます。
-<code>C.BOOL</code>が C の世界の<code>windows.h</code>で宣言されている型（実際はマクロ）ですね。</p>
+<p>コードは全部書いていくと長いので、前のコードと同じ所は省略します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> time
 
-<p>型名は<code>C.型名</code>、マクロも<code>C.マクロ名</code>、関数も<code>C.関数()</code>で呼び出せます。
-ポインタも<code>*C.型名</code>のようにして使えます。
-ただし、<code>void*</code>は<code>unsafe.Pointer</code>ですので、<code>unsafe</code>パッケージが必要です。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    MS_PER_UPDATE <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#66d9ef">def</span> __init__(self, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>world     <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>running   <span style="color:#f92672">=</span> False
+        self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+        self<span style="color:#f92672">.</span>_lag      <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            <span style="color:#75715e"># 前回の描画からの経過時間を得る</span>
+            current        <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+            elapsed        <span style="color:#f92672">=</span> current <span style="color:#f92672">-</span> self<span style="color:#f92672">.</span>_previous
+            self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> current
+            self<span style="color:#f92672">.</span>_lag     <span style="color:#f92672">+=</span> elapsed
+            
+            <span style="color:#75715e"># 一定時間経つまで何度か更新する</span>
+            <span style="color:#66d9ef">while</span> lag <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE:
+                self<span style="color:#f92672">.</span>handle_input()
+                self<span style="color:#f92672">.</span>update()
+                self<span style="color:#f92672">.</span>_lag <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE
+            
+            <span style="color:#75715e"># 一定時間経ったら描画処理</span>
+            self<span style="color:#f92672">.</span>draw(self<span style="color:#f92672">.</span>_lag <span style="color:#f92672">/</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE)
 
-<p>で、<code>unload()</code>はとりあえず<code>C.TRUE</code>を返しておきます。
-コードは以上です。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors         <span style="color:#f92672">=</span> actors
+        self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>actors:
+            <span style="color:#75715e"># 1つの actor だけ処理する</span>
+            actor <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>actors[self<span style="color:#f92672">.</span>_current_actor]
+            actor<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> (self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> len(self<span style="color:#f92672">.</span>actors)
 
-<p>これをコンパイルしてまずは<code>libshiori.a</code>を作ります。</p>
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<p>これで更新処理と描画処理が非同期っぽくなり、更新処理の方はできるだけ多く呼ばれつつ、一定時間ごとに描画処理が呼ばれるようになりました。
+なお、描画関数に引数が渡されているのは更新が途中でも描画関数が呼び出されるためで、この引数「補間（interpolation）」を基にして各オブジェクトの位置を決めたりします。
+詳しくは「<a href="http://gameprogrammingpatterns.com/gameloop.html">Game Loop - Sequencing Petterns - Game Programming Patterns</a>」にてわかりやすい絵付きで説明されています。
+アニメーションとかしないタイプの Roguelike なら「補間」は無視しても構いません。</p>
 
-<p>このとき、環境変数<code>CGO_ENABLED=1</code>と<code>GOOS=&quot;windows&quot;</code>、<code>GOARCH=386</code>、そして<code>CC=MinGWのGCCコマンド</code>を指定します。</p>
+<h2 id="行動を抽象化する">行動を抽象化する</h2>
 
-<p>今回は 32bit DLLを作るため、<code>GOARCH=386</code>を指定し、MinGW の GCC は 64bit環境で 32bitプログラムにコンパイルする<code>i686-w64-mingw32-gcc-win32</code>を使います（MinGWのgccコマンド名については<a href="https://kakurasan.blogspot.jp/">kakurasanのLinux備忘録</a>の「<a href="https://kakurasan.blogspot.jp/2015/07/debianubuntu-mingw-crosscompile.html">Debian/Ubuntuでmingw-w64を用いてWindows向けのプログラムをコンパイルする</a>」にわかりやすい一覧があります）。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> GOOS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;windows&#34;</span> GOARCH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;386&#34;</span> CC<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;i686-w64-mingw32-gcc-win32&#34;</span> go build -buildmode<span style="color:#f92672">=</span>c-archive -o libshiori.a</code></pre></div>
-<p>コンパイルすると<code>libshiori.a</code>と<code>libshiori.h</code>というファイルができます。
-<code>libshiori.h</code>は今回、使いません。</p>
+<p><code>Actor.update()</code> でそれぞれの actor 専用の行動を延々と書いていってもいいのですが、actor ができる行動の多くはどの actor にも共通ですので抽象化します。</p>
 
-<p>あとは GCC で<code>libshiori.a</code>から DLL を作るだけなんですが、そのために<code>libshiori.a</code>からエクスポートしたい関数名を def ファイルに書く必要があります。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-def" data-lang="def">LIBRARY	shiori
+<p>ゲーム内での行動を抽象化した <code>Action</code> クラスを用意し、<code>Actor</code> に次の行動を問い合わせるように変更しました。
+あと、actor の管理も別のクラスに分けて抽象化しておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> abc <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> deque
 
-EXPORTS
-    unload</code></pre></div>
-<p><code>LIBRARY</code>にライブラリ名を書き、<code>EXPORTS</code>にエクスポートする関数名を改行区切りで列挙します。
-この<code>EXPORTS</code>部分で実際に<code>GetProcAddress()</code>を使って呼び出すときの名前を決めます。
-もし<code>//export 関数名</code>でエクスポートした関数名と違う関数名にしたいときは、こう書きます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-def" data-lang="def">LIBRARY	shiori
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Queue</span>(deque):
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;現在のアイテムを覚えていることができるキュー&#34;&#34;&#34;</span>
+    <span style="color:#a6e22e">@property</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">current</span>(self):
+        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">        現在のアイテム
+</span><span style="color:#e6db74">        リストが空なら None を返す。
+</span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+        <span style="color:#66d9ef">return</span> self[<span style="color:#ae81ff">0</span>] <span style="color:#66d9ef">if</span> self <span style="color:#66d9ef">else</span> None
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">proceed</span>(self, n<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>):
+        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;次のアイテムへ進める&#34;&#34;&#34;</span>
+        self<span style="color:#f92672">.</span>rotate(<span style="color:#f92672">-</span>n)
 
-EXPORTS
-    unload = Unload</code></pre></div>
-<p>この場合、Go 側で<code>//export Unload</code>した関数を DLL から呼び出すときには<code>unload</code>という名前を使うことを示します。
-他にも<code>unload@0</code>とすると番号で呼び出したりできるそうですが、そこら辺は Google 先生に聞いてください。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>get_next_action(world)
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># action を実行する</span>
+        action<span style="color:#f92672">.</span>perform(actor, world)
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()
 
-<p>さて、この def ファイルを<code>shiori.def</code>として GCC を叩き、DLL を作ってもらいましょう！</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">i686-w64-mingw32-gcc-win32 -shared -o shiori.dll shiori.def libshiori.a -Wl,--allow-multiple-definition -static -lstdc++ -lwinmm -lntdll -lws2_32</code></pre></div>
-<p>なんやらいろいろオプションがついてますね。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_next_action</span>(self, world):
+        <span style="color:#66d9ef">return</span> None <span style="color:#75715e"># 状況に応じて何かの Action（か None）を返す</span>
 
-<p>まず、cgo で使ったコンパイラと同じコンパイラを使ったほうが良いでしょう（「いや、違うのでやりたい！」というなら止めませんが……）。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Action</span>(ABC):
+    <span style="color:#a6e22e">@abstractmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">perform</span>(self, actor, world):
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">NotImplementedError</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Abstract base class &#39;Action&#39; must be inherited.&#34;</span>)</code></pre></div>
+<p><code>Action</code> は抽象基底クラスなので、継承して <code>perform</code> の実装をそれぞれの Action に応じて書く必要があります。</p>
 
-<p>そして、共有ライブラリなので<code>-shared</code>です。
-出力ファイル名と先ほど作った def ファイルを指定して、Go の関数が入っている<code>libshiori.a</code>も指定します。</p>
+<p>これで様々な <code>Action</code> を好きな <code>Actor</code> にさせることができます。</p>
 
-<p>それから、cgo の吐くオブジェクトファイルはどうやら同じ定義とみなされるものが複数入っているようなので<code>-Wl,--allow-multiple-definition</code>をつけます（このへんよくわからないけど、mattnさんがつけてたので）。</p>
+<h2 id="ai-も抽象化して差し替え可能に">AI も抽象化して差し替え可能に</h2>
 
-<p><code>stdc++</code>や<code>winmm</code>、<code>ntdll</code>、<code>ws2_32</code>といったライブラリも使うので（preamble で<code>windows.h</code>インクルードしましたよね？）、<code>-static</code>をつけて静的にリンクしておきます。
-このときそれぞれのライブラリの依存に応じて順番に書いてあげないとリンカが「ふぇぇ……シンボルが見つからないよぅ」といったエラーを出します。</p>
+<p><code>Actor.get_next_action()</code> に actor ごとの行動戦略を実装していけば AI の実装はできますが、それでは同じコードを何度もコピペしそうな嫌な予感がします。</p>
 
-<p>ちなみに、<code>i686-w64-mingw32-gcc-win32</code>は 32bitをターゲットにして出力しますので GCCの<code>-m32</code>オプションはつけなくても大丈夫です。</p>
+<p>そこで、AI を抽象化した <code>Brain</code> クラスを用意して、そこに AI の実装を詰め込みます。
+そして、<code>Brain.decide_next_action()</code> が呼ばれたら与えられた actor の action キューに <code>Action</code> を積むようにします。</p>
 
-<p>ここまで成功すれば<code>shiori.dll</code>ができているはずです。</p>
+<p>メソッド名を変えたのは、<code>Brain.decide_next_action()</code> が直接 <code>Action</code> を返すのではなくキューに積むためです。
+こうすることでいくつかの <code>Action</code> を一連の行動としてキューに保存しておくことができます。</p>
 
-<h2 id="伺かの-shiori-を作る">伺かの SHIORI を作る</h2>
+<p>また、player の AI 用に <code>DummyBrain</code> という、何も <code>Action</code> を積まないものも定義しています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, brain<span style="color:#f92672">=</span>None, actions<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>brain   <span style="color:#f92672">=</span> brain <span style="color:#f92672">or</span> DummyBrain()
+        self<span style="color:#f92672">.</span>actions <span style="color:#f92672">=</span> Queue(actions)
 
-<p>なんとなくやり方がわかったところで、残りの 2つの関数を実装して SHIORI を作ります。</p>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Brain</span>(ABC):
+    <span style="color:#a6e22e">@abstractmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decide_next_action</span>(self, actor, world):
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">NotImplementedError</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Abstract base class &#39;Brain&#39; must be inherited.&#34;</span>)
 
-<h3 id="伺かとは">伺かとは</h3>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DummyBrain</span>(Brain):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decide_next_action</span>(self, actor, world):
+        <span style="color:#66d9ef">pass</span></code></pre></div>
+<p><code>World.update()</code> では <code>Actor.get_next_action()</code> ではなく actor の <code>Brain.decide_next_action()</code> を呼ぶようにします。
+この際、キューに <code>Action</code> が無いときだけ呼び出すようにしています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># action を実行する</span>
+        action<span style="color:#f92672">.</span>perform(actor, world)
+        
+        <span style="color:#75715e"># 次の action へ進める</span>
+        actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()</code></pre></div>
+<p>これで様々な AI を好きな <code>Actor</code> にさせることができます。</p>
 
-<p>伺かはデスクトップマスコットと呼ばれるアプリケーションで、デスクトップに（大抵は）かわいい女の子と謎の生物が住み着いて勝手に漫才しているのを眺めるソフトです。
-私の説明が下手なので楽しくなさそうですが、めっちゃ楽しいです。
-無料で利用でき、自分でキャラクターを作ることができたり、<a href="http://ukagaka.dojin.com/">オンリーイベント</a>があったりします。</p>
+<h2 id="プレイヤーの入力を-actor-に注入する">プレイヤーの入力を actor に注入する</h2>
 
-<p>仕組みについて超簡易的な説明をすると、「ベースウェア」と呼ばれるクライアントからイベントが飛んでくるので、それに応じて「SHIORI」と呼ばれるサーバがキャラが話す内容や表情の画像などを返すというやり取りでできています。
-キャラクターは見た目と脳に当たる部分の分離が図られており、それぞれ「シェル」と「ゴースト」と呼ばれます。
-SHIORI は「ゴースト」の根幹とも言える、人格を司る部分を担っていて、DLL で実装します。</p>
+<p>ここまで、プレイヤーと NPC は同じように扱ってきました。
+しかし、プレイヤーは AI の代わりにキーボードやマウス、ジョイパッドなどからの入力で動きます。</p>
 
-<p>普通はリクエストに応じて専用のスクリプトなどを解釈・実行し、レスポンスを生成する DLL を C や C++ で書きます。
-そうすることで SHIORI のすべてを DLL で賄うという大変な作業を回避して、ロジックとデータの分離を図ります。
-が、この記事ではそんなこと考えず超絶シンプルな「リクエストを全部無視する、何もしない SHIORI」を Go で書いてみたいと思います。</p>
+<p>これを実現するためにやるべきことは、プレイヤーの入力を <code>Action</code> に変換して actor に注入（injection）することです。</p>
 
-<p>この記事で説明している以外の伺か関連の仕様は <a href="http://ssp.shillest.net/ukadoc/manual/">UKADOC</a> か Google 先生に(ry</p>
+<p>プレイヤーの入力を注入する actor を覚えておくために、<code>World.player</code> プロパティを定義します。
+<code>World.player</code> は <code>World.actors</code> にも登録されるため、更新処理部分は全く手をつけなくて構いません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, player<span style="color:#f92672">=</span>None, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+        self<span style="color:#f92672">.</span>player <span style="color:#f92672">=</span> player
+    <span style="color:#a6e22e">@property</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">player</span>(self):
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>__player__
+    <span style="color:#a6e22e">@player.setter</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">player</span>(self, player):
+        <span style="color:#66d9ef">if</span> player <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            self<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>append(player)
+        self<span style="color:#f92672">.</span>__player__ <span style="color:#f92672">=</span> player</code></pre></div>
+<p>そして、プレイヤーの入力を <code>Action</code> にして <code>World.player</code> の action キューに追加します。
+ここではノン・ブロッキング IO のために curses を使っています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> time
+<span style="color:#f92672">import</span> curses
 
-<h3 id="ソース">ソース</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    MS_PER_UPDATE <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#66d9ef">def</span> __init__(self, stdscr, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>stdscr    <span style="color:#f92672">=</span> stdscr
+        self<span style="color:#f92672">.</span>world     <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>running   <span style="color:#f92672">=</span> False
+        self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+        self<span style="color:#f92672">.</span>_lag      <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_input</span>(self):
+        player <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>player
+        
+        <span style="color:#75715e"># player の番なら</span>
+        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current <span style="color:#f92672">==</span> player:
+            key <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>stdscr<span style="color:#f92672">.</span>getkey()
+            
+            <span style="color:#75715e"># 入力によって Action を player に注入</span>
+            <span style="color:#66d9ef">if</span> key <span style="color:#f92672">==</span> curses<span style="color:#f92672">.</span>KEY_UP:
+                action <span style="color:#f92672">=</span> WalkAction(Direction<span style="color:#f92672">.</span>North)
+                player<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>append(action)
+            <span style="color:#66d9ef">elif</span> key <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;q&#39;</span>:
+                self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
 
-<span style="color:#75715e">/* 
-</span><span style="color:#75715e">   #define UNICODE
-</span><span style="color:#75715e">   
-</span><span style="color:#75715e">   #include &lt;windows.h&gt;
-</span><span style="color:#75715e">   #include &lt;stdlib.h&gt;  // free()
-</span><span style="color:#75715e">   #include &lt;string.h&gt;  // strlen(), memcpy()
-</span><span style="color:#75715e">*/</span>
-<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;C&#34;</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>(stdscr):
+    world <span style="color:#f92672">=</span> World(player<span style="color:#f92672">=</span>Actor())
+    Game(stdscr, world<span style="color:#f92672">=</span>world)<span style="color:#f92672">.</span>run()
 
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;bytes&#34;</span>
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;unsafe&#34;</span>
-)
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    curses<span style="color:#f92672">.</span>wrapper(main)</code></pre></div>
+<h2 id="メインループを勝手に弄れないとき">メインループを勝手に弄れないとき</h2>
 
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {}
+<p>ブラウザや一般的な GUI ライブラリでは、メインループはブラウザやライブラリ側が管理していて、アプリケーション側で定義することができないことが多々あります。
+そんなときは、アプリケーション側のメインループを別に定義して、入力があれば <code>Action</code> を actor に注入します。</p>
 
-<span style="color:#75715e">//export load
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">load</span>(<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">HGLOBAL</span>, <span style="color:#a6e22e">length</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">long</span>) <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">BOOL</span> {
-	<span style="color:#75715e">//
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// extern &#34;C&#34; __declspec(dllexport) BOOL __cdecl load(HGLOBAL h, long length);
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// h      = DLL のパス（文字列）
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// length = h のサイズ
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// h は GlobalAlloc(GPTR, length) で確保されたメモリ領域へのポインタで、DLL 側で GlobalFree(h) する必要があります。
-</span><span style="color:#75715e"></span>	
-    <span style="color:#75715e">// せっかくサイズ情報があるので C.GoStringN() を使います。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// ここは C.GoString() でも大丈夫なはず。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// というか long -&gt; int のキャストってどうなんでしょう？
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// あ、HGLOBAL は void* なので、char* に相当する *C.char にキャストしています。
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">curDir</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GoStringN</span>((<span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">char</span>)(<span style="color:#a6e22e">h</span>), (<span style="color:#a6e22e">C</span>.<span style="color:#66d9ef">int</span>)(<span style="color:#a6e22e">length</span>))
-	
-	<span style="color:#75715e">// DLL のパスが入っているメモリを開放します。
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GlobalFree</span>(<span style="color:#a6e22e">h</span>)
-    
-    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;[shiori] Load&#34;</span>)
-    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;[shiori] curDir = \&#34;%s\&#34;\n&#34;</span>, <span style="color:#a6e22e">curDir</span>)
-    
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">TRUE</span>
+<p>ブラウザの場合は <code>window.setInterval()</code> や <code>window.setTimeuot()</code> を使います。
+コードは ES 2017 です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Keyboard</span> {
+    <span style="color:#a6e22e">constructor</span>(window) {
+        <span style="color:#66d9ef">this</span>.window     <span style="color:#f92672">=</span> window
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>       <span style="color:#f92672">=</span> {}
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+    }
+    <span style="color:#a6e22e">start</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
+            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+        }
+    }
+    <span style="color:#a6e22e">stop</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
+            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+        }
+    }
+    <span style="color:#a6e22e">on_keydown</span>(<span style="color:#a6e22e">event</span>) {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">event</span>
+    }
+    <span style="color:#a6e22e">on_keyup</span>(<span style="color:#a6e22e">event</span>) {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+    }
 }
 
-<span style="color:#75715e">//export unload
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">unload</span>() <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">BOOL</span> {
-    <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// extern &#34;C&#34; __declspec(dllexport) BOOL __cdecl unload(void);
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 何もしません。
-</span><span style="color:#75715e"></span>    
-    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;[shiori] Unload&#34;</span>)
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">TRUE</span>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span> {
+    <span style="color:#a6e22e">MS_PER_HANDLE_INPUT</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#a6e22e">MS_PER_UPDATE</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#a6e22e">MS_PER_DRAW</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#a6e22e">constructor</span>(window, <span style="color:#a6e22e">world</span><span style="color:#f92672">=</span><span style="color:#66d9ef">null</span>) {
+        <span style="color:#66d9ef">this</span>.window       <span style="color:#f92672">=</span> window
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">world</span>        <span style="color:#f92672">=</span> <span style="color:#a6e22e">world</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">World</span>()
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>     <span style="color:#f92672">=</span> <span style="color:#a6e22e">Keyboard</span>(<span style="color:#66d9ef">this</span>.window)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+    <span style="color:#a6e22e">run</span>() {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">start</span>()
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">handle_input</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_HANDLE_INPUT</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_UPDATE</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_DRAW</span>)
+    }
+    <span style="color:#a6e22e">pause</span>() {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">stop</span>()
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+    }
+    <span style="color:#a6e22e">handle_input</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">self</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">ArrowUp</span>) {
+            <span style="color:#a6e22e">action</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">WalkAction</span>(<span style="color:#a6e22e">Direction</span>.<span style="color:#a6e22e">North</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">world</span>.<span style="color:#a6e22e">player</span>.<span style="color:#a6e22e">actions</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">action</span>)
+        }
+    }
 }
 
-<span style="color:#75715e">//export request
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">request</span>(<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">HGLOBAL</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">long</span>) <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">HGLOBAL</span> {
-    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// extern &#34;C&#34; __declspec(dllexport) HGLOBAL __cdecl request(HGLOBAL h, long *length);
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// h      = リクエスト（文字列）
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// length = h のサイズ（load() と違ってポインタなので注意）
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// h は GlobalAlloc(GPTR, length) で確保されたメモリ領域へのポインタで、DLL 側で GlobalFree(h) する必要があります。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// リクエストの文字コードは Charset ヘッダを見るまでわかりませんが、ここでは簡便のため UTF-8 で来ると仮定しています。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 伺かベースウェアのデファクトスタンダードである SSP は UTF-8 で送ってくれるので、とりあえず、です。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// レスポンスは h とは別に GlobalAlloc(GPTR, n) し、そこに書き込みます。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// そして書き込んだ長さ n を length に書き込み、レスポンスが入ったメモリ領域へのポインタを返します。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// こっちの GlobalFree() はベースウェアがしてくれます。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// レスポンスも簡便のため一律に「204 No Content」を返しています。
-</span><span style="color:#75715e"></span>
-    <span style="color:#75715e">// リクエストが入っているメモリのサイズを取得します。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// load() と違い、ポインタなので注意してください。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">req_size</span> <span style="color:#f92672">:=</span> (<span style="color:#f92672">*</span><span style="color:#a6e22e">length</span>)
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(window) {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">game</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Game</span>(window)
+    <span style="color:#a6e22e">game</span>.<span style="color:#a6e22e">run</span>()
+}
 
-    <span style="color:#75715e">// せっかくサイズ情報があるので C.GoStringN() を使います。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// ここは C.GoString() でも大丈夫なはず。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">req_str</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GoStringN</span>((<span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">char</span>)(<span style="color:#a6e22e">h</span>), (<span style="color:#a6e22e">C</span>.<span style="color:#66d9ef">int</span>)(<span style="color:#a6e22e">req_size</span>))
+;(<span style="color:#66d9ef">function</span>(window){
+    <span style="color:#a6e22e">main</span>(window)
+})(window);</code></pre></div>
+<p>「pyglet」なら <code>pyglet.clock.schedule_interval()</code> が使えます。
+他のライブラリでも同じような仕組みがあると思います。</p>
 
-    <span style="color:#75715e">// レスポンスが入っているメモリを開放します。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GlobalFree</span>(<span style="color:#a6e22e">h</span>)
+<h2 id="ターン制ゲームにおけるスピードの実装">ターン制ゲームにおけるスピードの実装</h2>
 
-    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;[shiori] Request\n%s\n&#34;</span>, <span style="color:#a6e22e">req_str</span>)
+<p>さて、ここまでは「完全な」ターン制でしたが、あまりに完全なためにすべての actor が同じスピードで動いていました。
+これではつまらないので Angband の Energy を使った実装を参考に、actor ごとに異なるスピードを持てるように実装します。</p>
 
-    <span style="color:#75715e">// 正常終了だけどリクエストを無視するレスポンスを返します。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">res_str</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;SHIORI/3.0 204 No Content\nCharset: UTF-8\n&#34;</span>
+<p>まず、<code>Actor.speed</code> と <code>Actor.energy</code> を定義します。
+各ターンごとに <code>Actor</code> はスピードに応じた量の Energy を得て、一定量以上の Energy が貯まれば行動できるようになります。</p>
 
-    <span style="color:#75715e">// Go string の res_str を C で扱えるように、char の配列にします。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// C.CString() は malloc() してメモリを確保し、そこに Go string の内容をコピーする関数です。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">res_buf</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">CString</span>(<span style="color:#a6e22e">res_str</span>)
+<p>移動できない方向へ移動しようとしたときなどに Energy を消費しないよう、<code>Action.perform()</code> は成功したかどうかを返すように変更します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, brain<span style="color:#f92672">=</span>None, speed<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, actions<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>brain   <span style="color:#f92672">=</span> brain <span style="color:#f92672">or</span> DummyBrain()
+        self<span style="color:#f92672">.</span>speed   <span style="color:#f92672">=</span> speed
+        self<span style="color:#f92672">.</span>energy  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+        self<span style="color:#f92672">.</span>actions <span style="color:#f92672">=</span> Queue(actions)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    ENERGY_COST <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に energy を与える</span>
+        actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
+        
+        <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
+            <span style="color:#75715e"># action を実行する</span>
+            succeeded <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>perform(actor, world)
+            
+            <span style="color:#66d9ef">if</span> succeeded:
+                <span style="color:#75715e"># energy を消費する</span>
+                actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>ENERGY_COST
+            
+            <span style="color:#75715e"># 次の action へ進める</span>
+            actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calc_energy</span>(self, speed):
+        <span style="color:#66d9ef">return</span> math<span style="color:#f92672">.</span>floor(math<span style="color:#f92672">.</span>erf(speed <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>)</code></pre></div>
+<p><code>Actor.speed</code> から 1ターンに得られる Energy を計算するのに誤差関数を使っています。
+誤差関数が何を意味する関数なのかは正直良く知りませんが、そのグラフの形は理想的です。
+ただ、重そうな処理なので Angband のように予めテーブルを定義する方式の方がいいのかもしれません。</p>
+
+
     
-    <span style="color:#75715e">// C.CString() で確保したメモリは自前で free() してやる必要があります。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// この時、res_buf の型は *C.char なので unsafe.Pointer (つまり void*) にキャストします。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// defer も使えるなんて、便利ですね。
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">free</span>((<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>)(<span style="color:#a6e22e">res_buf</span>))
     
-    <span style="color:#75715e">// バッファのサイズを調べます。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// len(res_str) でもいいんですが、後でキャストの手間が少しだけ省けるので strlen() を呼んでいます。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">res_size</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">strlen</span>(<span style="color:#a6e22e">res_buf</span>)
     
-    <span style="color:#75715e">// 調べたサイズを基に、レスポンス用のメモリを確保します。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// SIZE_T は Win32 API での size_t です。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">ret</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GlobalAlloc</span>(<span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GPTR</span>, (<span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">SIZE_T</span>)(<span style="color:#a6e22e">res_size</span>))
     
-    <span style="color:#75715e">// 確保したメモリにレスポンスをコピーします。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// ret の型は C.HGLOBAL (つまり void*) なのですが、明示的に unsafe.Pointer にキャストしてやらねばなりません。
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 逆に res_size は strlen() を使ったために型が C.size_t となり、キャストする必要がありません。
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">memcpy</span>((<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>)(<span style="color:#a6e22e">ret</span>), (<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>)(<span style="color:#a6e22e">res_buf</span>), <span style="color:#a6e22e">res_size</span>)
     
-    <span style="color:#75715e">// レスポンスのサイズを request() の第 2引数である length ポインタが指す先にキャストして書き込んでやります。
-</span><span style="color:#75715e"></span>    <span style="color:#f92672">*</span><span style="color:#a6e22e">length</span> = (<span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">long</span>)(<span style="color:#a6e22e">res_size</span>)
     
-    <span style="color:#75715e">// レスポンスが入ったメモリ領域へのポインタ（HGLOBAL = void* です）を返して終了！
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ret</span>
-}</code></pre></div>
-<h3 id="コンパイルと実行">コンパイルと実行</h3>
+    
+    
+    
 
-<p>毎回コマンドを手打ちするのはたるいので、コンパイル用の簡単なシェルスクリプトを書いておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#!/usr/bin/sh
-</span><span style="color:#75715e"></span>
-CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> GOOS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;windows&#34;</span> GOARCH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;386&#34;</span> CC<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;i686-w64-mingw32-gcc-win32&#34;</span> go build -buildmode<span style="color:#f92672">=</span>c-archive -o libshiori.a
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
-<span style="color:#75715e"># go build が成功したら dll を作る
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$?<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
-    i686-w64-mingw32-gcc-win32 -shared -o shiori.dll shiori.def libshiori.a -Wl,--allow-multiple-definition -static -lstdc++ -lwinmm -lntdll -lws2_32
-<span style="color:#66d9ef">fi</span></code></pre></div>
-<p>これを<code>compile.sh</code>とでも名付けて<code>chmod +x</code>しておけば、コンパイルは<code>./compile.sh</code>でできるようになります（Makefile は辛いので書きたくありません……）。</p>
 
-<p>この DLL を実行するためには、Python や Go で呼び出しコードを書くか、<a href="http://ssp.shillest.net/">SSP</a> などの伺かベースウェアをインストールする必要があります。
-<a href="http://ssp.shillest.net/">SSP</a> は2017年現在最も活発に開発されている伺かのベースウェアで、Wine で動かすことができます（他にも <a href="http://ninix-aya.osdn.jp/">ninix-aya</a> という Wine なしで動くベースウェアもあります）。</p>
 
-<p>SSP を wine で実行するには、以下のコマンドを叩きます。
-このとき、適切なゴーストの栞として <code>shiori.dll</code> が読み込まれるようにしてください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">wine /path/to/ssp/installation/folder/ssp.exe</code></pre></div>
-<p>Wine の fixme がたくさん出てきますが、ちゃんと動きます。</p>
 
-<p>なお、SHIORI/3.0 を読み書きできるありがたい Go のライブラリ「<a href="https://github.com/Narazaka/shiorigo">github.com/Narazaka/shiorigo</a>」を<a href="https://narazaka.net/">奈良阪某</a>さんが公開してくれていますので、本格的に栞を書くなら<code>go get github.com/Narazaka/shiorigo</code>した方がよいでしょう。</p>
 
-<p>アドベントカレンダーに間に合うように Go で SHIORI を書いたゴーストを作っていますが、ネタが足りてないのでどうなることやら……
-と書くつもりでしたが、ネタがなくても「サンプルゴーストです」と言いはればいいかと思って <a href="https://github.com/kurousada/gohst">github.com/kurousada/gohst</a> に上げました。
-ここまで解説したソースをちょっと弄ってランダムトークするようにしています。</p>
 
-<h2 id="その他ハマりポイントとか-tips-とか">その他ハマりポイントとか Tips とか</h2>
+    
 
-<h3 id="wine上でのファイルパーミッションとfat32">Wine上でのファイルパーミッションとFAT32</h3>
 
-<p>Wine 上で Go の<code>os</code>パッケージを使ってファイルの読み書きをしようとすると権限がないと怒られてしまいます。
-これは FAT32 にファイルパーミッションという概念がないために起こっているようです。</p>
+    
 
-<p>仕方なく直接 Win32API の CreateFile() やら WriteFile() やら CloseFile() やらを叩いたところ、ちゃんと保存できました。</p>
+    
+      <p><figure class="image center-image">
+        <blockquote class="image-quoted" cite="https://ja.wikipedia.org/wiki/%e8%aa%a4%e5%b7%ae%e9%96%a2%e6%95%b0">
+          <a data-lightbox="lightbox-group-default" href="https://upload.wikimedia.org/wikipedia/commons/2/2f/Error_Function.svg" data-title="誤差関数のグラフ&nbsp;from&nbsp;誤差関数 - Wikipedia">
+            <img class="image-data" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Error_Function.svg" alt="誤差関数のグラフ" title="誤差関数のグラフ" onerror="this.classList.add('on-error')" />
+            <span class="image-alt">Not found</span>
+          </a>
+        </blockquote>
+        
+          <div class="image-quoted-cite">from&nbsp;<a href="https://ja.wikipedia.org/wiki/%e8%aa%a4%e5%b7%ae%e9%96%a2%e6%95%b0"><cite>誤差関数 - Wikipedia</cite></a></div>
+        
+        <figcaption>
+          
+            <a href="https://commons.wikimedia.org/wiki/File:Error_Function.svg" target="_blank">誤差関数のグラフ</a>
+          
+        </figcaption>
+      </figure></p>
+    
 
-<h3 id="writefile-のエンコーディング">WriteFile()のエンコーディング</h3>
 
-<p>Windows といえば Shift_JIS (cp932) です。
-Go の string は UTF-8 だそうで、そのまま安直に WriteFile() するとお化けと豆腐のエレクトリカル・パレードです。</p>
+<h2 id="action-をもっと柔軟に">Action をもっと柔軟に</h2>
 
-<p>そこで、「<a href="https://ja.stackoverflow.com/questions/6120/goでbyteをshift-jisの文字列に変換する">go - Goで[]byteをshift-jisの文字列に変換する - スタック・オーバーフロー</a>」を参考に Shift_JIS に変換してから書き込んだところ、ハピネスを感じることができました。</p>
+<p>例えば、右キーを押したらプレイヤーが右に歩くとします。
+しかしその方向に扉があったら右に歩くのではなく扉を開けてほしいですし、その方向に他の actor がいたら会話したり攻撃したりしてほしいです。</p>
 
-<h3 id="go-と-c-の橋渡し">Go と C の橋渡し</h3>
+<p>そのために <code>Action.perform()</code> の返り値として成功の可否と代わりに実行すべきアクションを返すようにします。
+また、複数ターンに渡って 1つの <code>Action</code> を実行できるように、実行が終了したかどうかも返すようにします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> NamedTuple, Optional
 
-<p>ソースにもいくつか出てきましたが、cgo には C から Go、Go から C の世界への変換関数が用意されています。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#75715e">// Go の string を malloc() で確保したメモリにコピーして C の世界でいじれる char の配列にします。
-</span><span style="color:#75715e">// この関数で確保したメモリは自前でfree()する必要があります。
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">CString</span>(<span style="color:#66d9ef">string</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">char</span>
-
-<span style="color:#75715e">// Go の []byte を malloc() で確保したメモリにコピーして C の世界でいじれる配列にします。
-</span><span style="color:#75715e">// この関数で確保したメモリは自前でfree()する必要があります。
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">CBytes</span>([]<span style="color:#66d9ef">byte</span>) <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>
-
-<span style="color:#75715e">// C の世界の char 配列を Go の string に変換します。
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GoString</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">char</span>) <span style="color:#66d9ef">string</span>
-
-<span style="color:#75715e">// C.GoString() のサイズを指定できるバージョンです。
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GoStringN</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">char</span>, <span style="color:#a6e22e">C</span>.<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">string</span>
-
-<span style="color:#75715e">// C の配列を Go []byte にします。
-</span><span style="color:#75715e">// サイズ指定必須です。
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">GoBytes</span>(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>, <span style="color:#a6e22e">C</span>.<span style="color:#66d9ef">int</span>) []<span style="color:#66d9ef">byte</span></code></pre></div>
-<p>Go から C の世界（またはその逆）にアクセスする他の方法は、GoDoc の「<a href="https://golang.org/cmd/cgo/">Command cgo</a>」にまとめられています。</p>
-
-<h3 id="c-の関数の返り値">C の関数の返り値</h3>
-
-<p>C の関数は常に、関数の返り値とエラーという 2つの値を返します。</p>
-
-<p>たとえ<code>void ponyo(void);</code>でも、2つ返ってきます。
-そういうときは<code>_</code>を使いましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#a6e22e">ret</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">one</span>(<span style="color:#ae81ff">1</span>)    <span style="color:#75715e">// int one(int);
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">C</span>.<span style="color:#a6e22e">ponyo</span>()</code></pre></div>
-<p>ただし、<code>C.malloc()</code>は Go 側でラップしているので、返り値は 1つです。
-触っちゃいけないところをお触りしたらパニックを起こすようになっているとのこと。</p>
-
-<h3 id="c-の関数を定義したい">C の関数を定義したい！</h3>
-
-<p>自分で書いた C の関数を Go から呼ぶには、</p>
-
-<ol>
-<li>プロトタイプ宣言が書かれたヘッダファイルを preamble でインクルード</li>
-<li>関数の実体を書いた<code>*.c</code>や<code>*.cpp</code>を GCC などでコンパイル</li>
-<li>Go のオブジェクトファイルと 2.をリンク</li>
-</ol>
-
-<p>という、とてもめんどっちいやり方をしなくてはいけないようです（いやこれができるのはかなりすごいことなんだけども）。</p>
-
-<p>ただ、単なるラッパ程度の簡単な関数をちょちょっと使いたいときは、<code>static inilne</code>な関数にしましょう。
-これなら preamble に書いても怒られません。</p>
-
-<h3 id="const-の-go-世界での型はどうすればいいんですか">const の Go 世界での型はどうすればいいんですか？</h3>
-
-<p>Go の世界では<code>const char*</code>は表せません。
-<code>*C.char</code>、つまり<code>char*</code>で我慢するか、どうしても必要なときは<code>char*</code>を受け取って<code>const char*</code>で関数を呼ぶラッパを書きましょう。</p>
-
-<h3 id="struct-や-interface-は-union-は">struct や interface は？ union は？</h3>
-
-<p>「<a href="https://golang.org/cmd/cgo/">Command cgo</a>」をよく読みましょう。</p>
-
-<h3 id="go-build-x">go build -x</h3>
-
-<p><code>go build</code>に<code>-x</code>オプションをつけると、コンパイラが何をしているかが出力されます。
-つまり cgo がかなり GCC に頼っていることがわかります。</p>
-
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ActionResult</span>(NamedTuple):
+    succeeded  : bool               <span style="color:#f92672">=</span> True
+    done       : bool               <span style="color:#f92672">=</span> True
+    alternative: Optional[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;Action&#39;</span>] <span style="color:#f92672">=</span> None</code></pre></div>
+<p>あとは <code>ActionResult.alternative</code> が <code>None</code> になるまで <code>Action</code> を実行したりなんだりかんだりします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に energy を与える</span>
+        actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
+        
+        <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
+            <span style="color:#75715e"># action を実行する</span>
+            <span style="color:#66d9ef">while</span> action:
+                result <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>perform(actor, world)
+                action <span style="color:#f92672">=</span> result<span style="color:#f92672">.</span>alternative
+            
+            <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>succeeded:
+                <span style="color:#75715e"># energy を消費する</span>
+                actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>ENERGY_COST
+            
+            <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>done:
+                <span style="color:#75715e"># 次の action へ進める</span>
+                actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()</code></pre></div>
 <h2 id="まとめ">まとめ</h2>
 
-<p>C の代替は Go でいいんじゃないかと思えました。
-書きやすくて速くてクロスコンパイルまでできちゃうなんて、すご〜い！</p>
+<p>本当は昨日公開するはずでしたが、こたつに「ねぇねぇ、いっしょにいようよぉ」とせがまれてしまい、こんなに時間がかかってしまいました。
+サンプルコードは実際のコードベースから抜き出して型アノテーションをなくしたりわかりやすくなるように手直ししたものなので、動かなかったらうまくがんばってください。</p>
 
-<p>みんな Go を使って新しいゴーストを書けばいいと思うよ！
-問題があるとすれば<a href="https://github.com/Ikagaka">如何か</a>への移植ですが、<a href="https://github.com/gopherjs/gopherjs">GopherJS</a> ならやってくれそうな気がしますし……</p>
-
-<p>あと、この記事の最後の方は深夜テンションで書いてるので色々問題があったとしても許してください……
-なんでこんな時間に上げることになったかとい(ry</p>
-
-<p>それからそれから、実は Go をちゃんと触るのは初めてなので、間違いとかこうした方がいいよとかあったら教えてください。</p>
-
-<p>えんいー！</p>
-
-<hr />
-
-<p>この記事は <a href="https://qiita.com/advent-calendar/2017/go4">Go Advent Calender 2017（その4）</a> の 1日目の記事です。</p>
-
-<p>2日目は <a href="https://qiita.com/kami_zh">kami_zh</a> さんによる「<a href="https://qiita.com/kami_zh/items/ff636f15da87dabebe6c">Goで標準出力をテストする方法</a>」です。</p>
+<p>Go で書こうとしたものの、グラフィックライブラリが貧弱だったので Python 3.6 + pyglet 1.3 で書いています。
+でも SFML の Go バインディングがあることに気づいて書きなおそうか迷っています。
+今更デスクトップゲームは流行らないかもしれないし、将来的にはブラウザでも動くようにしたいんですけども、まあとりあえず。</p>
     </div>
 
     
@@ -820,7 +966,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&text=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux&via=" target="_blank" class="share-btn twitter">
+  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&text=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97&via=" target="_blank" class="share-btn twitter">
     <i class="fa fa-twitter"></i>
     <p>Twitter</p>
     </a>
@@ -828,7 +974,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn google-plus">
+  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn google-plus">
     <i class="fa fa-google-plus"></i>
     <p>Google+</p>
   </a>
@@ -836,7 +982,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn facebook">
+  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn facebook">
     <i class="fa fa-facebook"></i>
     <p>Facebook</p>
   </a>
@@ -844,7 +990,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/" target="_blank" class="share-btn hatena">
+  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/" target="_blank" class="share-btn hatena">
     <i class="icon-hatena"></i>
     <p>Hatena</p>
   </a>
@@ -852,7 +998,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn pocket">
+  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn pocket">
     <i class="fa fa-get-pocket"></i>
     <p>Pocket</p>
   </a>
@@ -860,7 +1006,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn reddit">
+  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn reddit">
     <i class="fa fa-reddit-alien"></i>
     <p>Reddit</p>
   </a>
@@ -868,7 +1014,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn linkedin">
+  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn linkedin">
       <i class="fa fa-linkedin"></i>
       <p>LinkedIn</p>
     </a>
@@ -876,7 +1022,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn stumbleupon">
+  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn stumbleupon">
     <i class="fa fa-stumbleupon"></i>
     <p>StumbleUpon</p>
   </a>
@@ -884,7 +1030,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&description=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn pinterest">
+  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&description=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn pinterest">
     <i class="fa fa-pinterest-p"></i>
     <p>Pinterest</p>
   </a>
@@ -892,7 +1038,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn email">
+  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn email">
     <i class="fa fa-envelope"></i>
     <p>Email</p>
   </a>
@@ -932,13 +1078,13 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
     
     
-        <li><a href='http://kurousada.ga/categories/linux'>Linux</a></li>
-    
         <li><a href='http://kurousada.ga/categories/tech'>tech</a></li>
     
-        <li><a href='http://kurousada.ga/categories/golang'>golang</a></li>
+        <li><a href='http://kurousada.ga/categories/rl'>RL</a></li>
     
-        <li><a href='http://kurousada.ga/categories/ukagaka'>ukagaka</a></li>
+        <li><a href='http://kurousada.ga/categories/python'>python</a></li>
+    
+        <li><a href='http://kurousada.ga/categories/js'>js</a></li>
     
 </ul>
 
@@ -949,8 +1095,8 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 </article>
 <ul class="actions pagination">
     
-        <li><a href="http://kurousada.ga/posts/disney/tds/eat-them-in-tokyo-disney-sea/"
-                class="button big previous">ディズニーシーではこれを食え！</a></li>
+        <li><a href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/"
+                class="button big previous">Goを使ってDLLをクロスコンパイル on Linux</a></li>
     
 
     
@@ -1000,6 +1146,17 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
       <header>
         <h3>Related Posts</h3>
       </header>
+      
+        <li class="post">
+          <a class="post-link" href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/">
+            <article>
+              <header>
+                <h4 class="post-link-title">Goを使ってDLLをクロスコンパイル on Linux</h4>
+                <time class="published" datetime="2017-12-01">December 1, 2017</time>
+              </header>
+            </article>
+          </a>
+        </li>
       
         <li class="post">
           <a class="post-link" href="http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/">
@@ -1053,7 +1210,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&text=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux&via=" target="_blank" class="share-btn twitter">
+  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&text=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97&via=" target="_blank" class="share-btn twitter">
     <i class="fa fa-twitter"></i>
     <p>Twitter</p>
     </a>
@@ -1061,7 +1218,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn google-plus">
+  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn google-plus">
     <i class="fa fa-google-plus"></i>
     <p>Google+</p>
   </a>
@@ -1069,7 +1226,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn facebook">
+  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn facebook">
     <i class="fa fa-facebook"></i>
     <p>Facebook</p>
   </a>
@@ -1077,7 +1234,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/" target="_blank" class="share-btn hatena">
+  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/" target="_blank" class="share-btn hatena">
     <i class="icon-hatena"></i>
     <p>Hatena</p>
   </a>
@@ -1085,7 +1242,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn pocket">
+  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn pocket">
     <i class="fa fa-get-pocket"></i>
     <p>Pocket</p>
   </a>
@@ -1093,7 +1250,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn reddit">
+  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn reddit">
     <i class="fa fa-reddit-alien"></i>
     <p>Reddit</p>
   </a>
@@ -1101,7 +1258,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn linkedin">
+  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn linkedin">
       <i class="fa fa-linkedin"></i>
       <p>LinkedIn</p>
     </a>
@@ -1109,7 +1266,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&title=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn stumbleupon">
+  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn stumbleupon">
     <i class="fa fa-stumbleupon"></i>
     <p>StumbleUpon</p>
   </a>
@@ -1117,7 +1274,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f&description=Go%e3%82%92%e4%bd%bf%e3%81%a3%e3%81%a6DLL%e3%82%92%e3%82%af%e3%83%ad%e3%82%b9%e3%82%b3%e3%83%b3%e3%83%91%e3%82%a4%e3%83%ab%20on%20Linux" target="_blank" class="share-btn pinterest">
+  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&description=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn pinterest">
     <i class="fa fa-pinterest-p"></i>
     <p>Pinterest</p>
   </a>
@@ -1125,7 +1282,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
 
 <li>
-  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2fcross-compile-dll-using-golang-on-linux%2f" target="_blank" class="share-btn email">
+  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn email">
     <i class="fa fa-envelope"></i>
     <p>Email</p>
   </a>
@@ -1252,6 +1409,24 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
 
                 
                     <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ローグライクのターン制ゲームループ</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2018-01-02'>
+                                    January 2, 2018</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
                       <a class="post-link" href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/">
                         <article>
                             <header>
@@ -1323,24 +1498,6 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
                       </a>
                     </li>
                 
-                    <li class="post">
-                      <a class="post-link" href="http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/">
-                        <article>
-                            <header>
-                                <h4 class="post-link-title">オフラインでも懐かしいあの頃に戻る方法</h4>
-                                
-                                    
-                                        
-                                    
-                                
-                                <time class="published" datetime=
-                                    '2017-10-31'>
-                                    October 31, 2017</time>
-                            </header>
-                        </article>
-                      </a>
-                    </li>
-                
 
                 
                     <li class="post more-post">
@@ -1398,7 +1555,7 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
                         <article>
                             <header>
                                 <h4 class="post-link-title">tech</h4>
-                                <span style="float:right;">4</span>
+                                <span style="float:right;">5</span>
                             </header>
                         </article>
                       </a>
@@ -1471,6 +1628,17 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
                     </li>
                 
                     <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/rl/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">RL</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
                       <a class="post-link" href="http://kurousada.ga/categories/eva/">
                         <article>
                             <header>
@@ -1508,6 +1676,28 @@ Go の string は UTF-8 だそうで、そのまま安直に WriteFile() する�
                         <article>
                             <header>
                                 <h4 class="post-link-title">golang</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/js/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">js</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/python/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">python</h4>
                                 <span style="float:right;">1</span>
                             </header>
                         </article>
