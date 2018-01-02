@@ -1,0 +1,1892 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        
+            
+            
+                <title>ローグライクのターン制ゲームループ - Kuro Usada ga!</title>
+            
+        
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content="Hugo 0.30.2" />
+        
+
+
+        
+            <meta name="author" content="Kuro Usada">
+        
+        
+            <meta name="description" content="A turn based gameloop for roguelikes.">
+        
+
+        <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ローグライクのターン制ゲームループ"/>
+<meta name="twitter:description" content="A turn based gameloop for roguelikes."/>
+
+        <meta property="og:title" content="ローグライクのターン制ゲームループ" />
+<meta property="og:description" content="A turn based gameloop for roguelikes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/" />
+
+
+
+<meta property="article:published_time" content="2018-01-02T23:19:16&#43;09:00"/>
+
+<meta property="article:modified_time" content="2018-01-02T23:19:16&#43;09:00"/>
+
+
+
+
+
+
+
+
+
+
+
+        
+<meta itemprop="name" content="ローグライクのターン制ゲームループ">
+<meta itemprop="description" content="A turn based gameloop for roguelikes.">
+
+
+<meta itemprop="datePublished" content="2018-01-02T23:19:16&#43;09:00" />
+<meta itemprop="dateModified" content="2018-01-02T23:19:16&#43;09:00" />
+<meta itemprop="wordCount" content="5558">
+
+
+
+<meta itemprop="keywords" content="" />
+
+        
+
+        
+        
+        
+            
+        
+
+        
+        
+
+        
+            
+            
+                
+                    <link rel="stylesheet" href="http://kurousada.ga/css/site.min.css">
+                
+            
+                
+                    <link rel="stylesheet" href="http://kurousada.ga/css/main.css">
+                
+            
+            
+        
+
+        
+            
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-99969227-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+        
+        
+    </head>
+    <body>
+
+      
+      <div id="wrapper">
+
+    
+    
+<header id="header">
+    
+        <h2><a href="http://kurousada.ga/">Kuro Usada ga!</i></a></h2>
+    
+
+    <nav class="links">
+        <ul>
+            
+                <li>
+                    <a href="http://kurousada.ga/posts">
+                        Posts
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="http://kurousada.ga/categories">
+                        Categories
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="http://kurousada.ga/about">
+                        About
+                    </a>
+                </li>
+            
+        </ul>
+    </nav>
+    <nav class="main">
+        <ul>
+            
+            <li id="share-nav" class="share-menu" style="display:none;">
+                <a class="fa-share-alt" href="#share-menu">Share</a>
+            </li>
+            
+            
+            <li class="back-to-top-link">
+                <a class="fa-arrow-up" href="#top">Top</a>
+            </li>
+            <li class="menu">
+                <a class="fa-bars" href="#menu">Menu</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+
+<section id="menu">
+
+    
+        <section>
+            <div id="search">
+              <script async src="https://cse.google.com/cse.js?cx=018175984642811849393:lior-73d8wc"></script>
+              <gcse:searchbox-only></gcse:searchbox-only>
+            </div>
+            
+        </section>
+
+    
+        <section>
+            <ul class="links">
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts">
+                            <h3>
+                                
+                                Posts
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/categories">
+                            <h3>
+                                
+                                Categories
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/about">
+                            <h3>
+                                
+                                About
+                            </h3>
+                        </a>
+                    </li>
+                
+            </ul>
+        </section>
+
+    
+        <section>
+            <ul class="links">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                
+                    
+                
+
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/"><p>ローグライクのターン制ゲームループ</p></a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/"><p>Goを使ってDLLをクロスコンパイル on Linux</p></a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts/disney/tds/eat-them-in-tokyo-disney-sea/"><p>ディズニーシーではこれを食え！</p></a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts/disney/tds/drink-them-in-tokyo-disney-sea/"><p>ディズニーシーではこれを飲め！</p></a>
+                    </li>
+                
+                    <li>
+                        <a href="http://kurousada.ga/posts/disney/disney-food-dogma/"><p>ディズニー・フードの鉄則</p></a>
+                    </li>
+                
+            </ul>
+        </section>
+
+    
+        
+</section>
+
+    <section id="share-menu">
+    <section id="social-share-nav">
+        <ul class="links">
+            <header>
+                <h3>Share this post <i class="fa fa-smile-o"></i></h3>
+            </header>
+            
+
+
+<li>
+  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&text=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+    </a>
+</li>
+
+
+<li>
+  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/" target="_blank" class="share-btn hatena">
+    <i class="icon-hatena"></i>
+    <p>Hatena</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn pocket">
+    <i class="fa fa-get-pocket"></i>
+    <p>Pocket</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn linkedin">
+      <i class="fa fa-linkedin"></i>
+      <p>LinkedIn</p>
+    </a>
+</li>
+
+
+<li>
+  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&description=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn pinterest">
+    <i class="fa fa-pinterest-p"></i>
+    <p>Pinterest</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+  </a>
+</li>
+
+        </ul>
+    </section>
+</section>
+
+    
+    <div id="main">
+        
+        
+        <article class="post">
+    <header>
+    <div class="title">
+        
+            <h1><a href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/">ローグライクのターン制ゲームループ</a></h1>
+            
+        
+        
+            <p>A turn based gameloop for roguelikes.</p>
+        
+    </div>
+    <div class="meta">
+        
+        
+            
+                
+            
+        
+
+        <time class="published" datetime='2018-01-02'>
+            January 2, 2018
+        </time>
+        
+        <span class="author">Kuro Usada</span>
+        
+            <p>12 minute read</p>
+        
+        
+    </div>
+</header>
+
+
+    
+    
+
+
+
+    
+        
+    
+    
+    
+
+
+
+
+
+
+    
+
+
+    
+    
+
+    <span class="image featured">
+        <img class="featured-data" src="http://kurousada.ga/img/2018/01/a-turn-based-gameloop-for-roguelikes/featured" alt="変愚蛮怒 by Hengband Dev Team" onerror="this.classList.add('on-error')" />
+        <span class="featured-alt">Not found</span>
+    </span>
+    <p class="featured-copyright">
+        
+            
+                <a href="http://hengband.osdn.jp/" target="_blank">
+            
+            変愚蛮怒
+            
+                </a>
+            
+        
+        
+            &nbsp;by&nbsp;
+            
+            Hengband Dev Team
+            
+        
+    </p>
+
+
+    <div id="content">
+        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#roguelike-とはどんな食べ物なのか">Roguelike とはどんな食べ物なのか</a></li>
+<li><a href="#ゲームループの実装方針">ゲームループの実装方針</a>
+<ul>
+<li><a href="#スピードの概念があるターン制">スピードの概念があるターン制</a></li>
+<li><a href="#プレイヤーと-npc-は同じように扱う">プレイヤーと NPC は同じように扱う</a></li>
+<li><a href="#ロジックと-ui-の分離">ロジックと UI の分離</a></li>
+<li><a href="#npc-の-ai-は差し替え可能にする">NPC の AI は差し替え可能にする</a></li>
+</ul></li>
+<li><a href="#よくあるゲームループ">よくあるゲームループ</a></li>
+<li><a href="#更新と描画を非同期っぽくする">更新と描画を非同期っぽくする</a></li>
+<li><a href="#行動を抽象化する">行動を抽象化する</a></li>
+<li><a href="#ai-も抽象化して差し替え可能に">AI も抽象化して差し替え可能に</a></li>
+<li><a href="#プレイヤーの入力を-actor-に注入する">プレイヤーの入力を actor に注入する</a></li>
+<li><a href="#メインループを勝手に弄れないとき">メインループを勝手に弄れないとき</a></li>
+<li><a href="#ターン制ゲームにおけるスピードの実装">ターン制ゲームにおけるスピードの実装</a></li>
+<li><a href="#action-をもっと柔軟に">Action をもっと柔軟に</a></li>
+<li><a href="#まとめ">まとめ</a></li>
+</ul></li>
+</ul>
+</nav>
+        <p>新年あけましておめでとうございます。
+本当はクリスマスに Roguelike をリリースしたかったんですが色々あって大幅に遅れ、いつの間にか新年になってました。
+完成まで待つといつになるかわからないので、ソース以外の日本語情報が少ないターン制ゲームループの実装について書きます。
+ブラウザでもデスクトップでも大丈夫です。</p>
+
+<p></p>
+
+<p><del>パク</del> 参考にしたのは「<a href="http://gameprogrammingpatterns.com/">Game Programming Patterns</a>」という本と、その著者 Bob Nystrom さんのブログ記事である「<a href="http://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/">A Turn-Based Game Loop</a>」です。
+Nystrom さんの本やブログは必見の価値有りです（本も Web で全文公開されています）。
+なんならこの記事読まなくても参考元の記事を読めば書けます。</p>
+
+<h2 id="roguelike-とはどんな食べ物なのか">Roguelike とはどんな食べ物なのか</h2>
+
+<p><strong>食べ物ではありません。</strong></p>
+
+<p>コンピュータゲームの一種で、ジャンルは RPG に属します。
+元々は Unix 向けのコンソールゲームである「Rogue（ローグ）」が持つ特徴を備えた「Rogue-like Games（ローグのようなゲーム）」の総称であり、ジャンル名とも言えます。</p>
+
+<p>Rogue には、以下のような特徴があります。</p>
+
+<ul>
+<li>剣と魔法の世界のシングルプレイヤー RPG である。</li>
+<li>リアルタイムではなくターン制で、キャラクタのスピードによって行動順が割り当てられる。</li>
+<li>ダンジョンを徘徊しながら階段を見つけてひたすら下っていくゲームで、各階のマップは毎回自動で生成される。</li>
+<li>セーブはゲーム中断のためにしか用意されておらず、一度死んだらキャラの作成からやり直し。</li>
+<li>アイテムの多くは未鑑定状態で、鑑定して初めてどんなアイテムかわかる。</li>
+<li>食料を食べられず空腹になると死ぬ。</li>
+<li>キーボードで操作し、キーの一つ一つに行動が割り当てられている。</li>
+<li>コンソールゲームだが、Curses ライブラリを使ってグラフィカルな表現に近い UI を持つ。</li>
+<li>マップでは ASCII 文字がプレイヤーや通路、壁、アイテム、モンスターなどを表す（下図）。</li>
+</ul>
+
+<pre><code>                              ------------
+                              |.....!....|
+                              |..@.......|
+            ##################+.........:|
+            #                 |...%.H....|
+            #                 ------+-----
+            #
+         ---+---
+         |.....|
+         |.?...|
+         |.....+######        ---------+----
+         -------     #        |............|
+                     #        |............+
+                     #########+..........^.|
+                              |............|
+                              --------------
+</code></pre>
+
+<p>しかしこの Rogue が大変おもしろかったため、「<a href="https://www.nethack.org/">NetHack</a>」や「<a href="http://rephial.org/">Angband</a>」など色々な亜種が生まれ、Roguelike と名乗るゲームが数多くできました。
+元になった Rogue は様々な特徴を持っていたので、どんなゲームが Roguelike なのかという定義については議論の余地があります。
+詳しくは「<a href="http://2dgames.jp/2015/03/19/roguelike/">ローグライクの定義まとめ – 2dgames.jp</a>」を参照してください。</p>
+
+<p>一言で言うと「やったことないなら、やってくさだい」です。</p>
+
+<h2 id="ゲームループの実装方針">ゲームループの実装方針</h2>
+
+<p>「こんな感じにしたいけど、設計はどうすればいいんだろう……」と悩んでたら上述の記事にまさにその通りな設計が書いてありました。</p>
+
+<h3 id="スピードの概念があるターン制">スピードの概念があるターン制</h3>
+
+<p>ただのターン制では、プレイヤーが 1歩動くとモンスターも 1歩動きます。
+例外なく同じ順序で、誰もが同じスピードです。</p>
+
+<p>しかしこれではつまらないので、スピードの概念を導入します。
+スピードが早いキャラクターほど多くの行動を取ることができ、プレイヤーが 1歩動く→モンスターが 2歩動く→プレイヤーが 1歩動く→モンスターが 3歩動く、といった感じになります。</p>
+
+<h3 id="プレイヤーと-npc-は同じように扱う">プレイヤーと NPC は同じように扱う</h3>
+
+<p>Roguelike、特に私が大好きな「<a href="http://ylvania.org/jp/elona">Elona</a>」は超自由度が高いゲームです（Elona についてはまた今度書きます）。
+「ゼルダの伝説 ブレス オブ ザ ワイルド」よりもできることが多いんじゃないかというぐらいの自由度です（ゼルダはプレイしたことないです）。</p>
+
+<p>薬を飲んだり杖を振ったりといった行動をプレイヤーと NPC で共通化できれば、労力が少なくてすむはずです。</p>
+
+<h3 id="ロジックと-ui-の分離">ロジックと UI の分離</h3>
+
+<p>今回作っているローグライクは、コンソールベースではなく Elona のような GUI にしたいと考えていました。
+しかし昔ながらのコンソールも捨てがたいし……というわけで、ロジックと UI を分離します。</p>
+
+<p>コンソールベースの UI は curses 一択ですが、GUI ライブラリは「SDL」「SFML」「OpenGL」などいくらでもあり、選択に迷います。
+ロジックと UI を分離することで、UI 部分が依存する GUI ライブラリのメンテナンスが止まっても労力が少なくて済みます。</p>
+
+<h3 id="npc-の-ai-は差し替え可能にする">NPC の AI は差し替え可能にする</h3>
+
+<p>NPC の行動戦略を決定する AI は差し替え可能にしたいです。
+NPC をペットとして動かすことができるようにしたいのですが、その時に行動戦略も指示することができると楽しいです。</p>
+
+<h2 id="よくあるゲームループ">よくあるゲームループ</h2>
+
+<p>今書いているのが Python 3.6 なので、サンプルは Python 3.6 で書きます（実際のコードとは異なります）。</p>
+
+<p>さて、まずはよくあるゲームループを見てみましょう（ブラウザは特殊なので、対応はもう少し先です）。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">pass</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">pass</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors <span style="color:#f92672">=</span> []):
+        self<span style="color:#f92672">.</span>actors  <span style="color:#f92672">=</span> actors
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            self<span style="color:#f92672">.</span>handle_input()
+            self<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>update()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>draw()
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<p>このゲームループではゲームのロジックと UI の分離があまりなされていません。
+<code>Actor</code> クラスがゲームロジックも描画も司っています。</p>
+
+<p>そこで、<code>Game</code> オブジェクトからゲームロジックを担当する <code>World</code> クラスを切り出します。
+そしてこの <code>World</code> クラスを <code>Game</code> クラスが持つようにし、UI から <code>World</code> の更新を進めるようにします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Sprite</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actor):
+        self<span style="color:#f92672">.</span>actor <span style="color:#f92672">=</span> actor
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">pass</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">pass</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>world   <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>sprites <span style="color:#f92672">=</span> {}
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            self<span style="color:#f92672">.</span>handle_input()
+            self<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>update()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>actors:
+            sprite <span style="color:#f92672">=</span> Sprite(actor)
+            sprite<span style="color:#f92672">.</span>draw()
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> actors
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            actor<span style="color:#f92672">.</span>update()
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<h2 id="更新と描画を非同期っぽくする">更新と描画を非同期っぽくする</h2>
+
+<p><code>World.update()</code> ではすべての actor を一度に処理していました。
+しかし、actor が増えて更新処理が遅れると描画処理にも遅れが生じ、非常に嫌なことになります。</p>
+
+<p>そこで、更新処理をより細かいステップにして、一定の時間が経つまでできるだけ呼び出した後、描画処理を呼び出すことにしましょう。</p>
+
+<p>コードは全部書いていくと長いので、前のコードと同じ所は省略します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> time
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    MS_PER_UPDATE <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#66d9ef">def</span> __init__(self, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>world     <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>running   <span style="color:#f92672">=</span> False
+        self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+        self<span style="color:#f92672">.</span>_lag      <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> True
+        <span style="color:#66d9ef">while</span> self<span style="color:#f92672">.</span>running:
+            <span style="color:#75715e"># 前回の描画からの経過時間を得る</span>
+            current        <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+            elapsed        <span style="color:#f92672">=</span> current <span style="color:#f92672">-</span> self<span style="color:#f92672">.</span>_previous
+            self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> current
+            self<span style="color:#f92672">.</span>_lag     <span style="color:#f92672">+=</span> elapsed
+            
+            <span style="color:#75715e"># 一定時間経つまで何度か更新する</span>
+            <span style="color:#66d9ef">while</span> lag <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE:
+                self<span style="color:#f92672">.</span>handle_input()
+                self<span style="color:#f92672">.</span>update()
+                self<span style="color:#f92672">.</span>_lag <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE
+            
+            <span style="color:#75715e"># 一定時間経ったら描画処理</span>
+            self<span style="color:#f92672">.</span>draw(self<span style="color:#f92672">.</span>_lag <span style="color:#f92672">/</span> self<span style="color:#f92672">.</span>MS_PER_UPDATE)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors         <span style="color:#f92672">=</span> actors
+        self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>actors:
+            <span style="color:#75715e"># 1つの actor だけ処理する</span>
+            actor <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>actors[self<span style="color:#f92672">.</span>_current_actor]
+            actor<span style="color:#f92672">.</span>update()
+            self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> (self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> len(self<span style="color:#f92672">.</span>actors)
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+<p>これで更新処理と描画処理が非同期っぽくなり、更新処理の方はできるだけ多く呼ばれつつ、一定時間ごとに描画処理が呼ばれるようになりました。
+なお、描画関数に引数が渡されているのは更新が途中でも描画関数が呼び出されるためで、この引数「補間（interpolation）」を基にして各オブジェクトの位置を決めたりします。
+詳しくは「<a href="http://gameprogrammingpatterns.com/gameloop.html">Game Loop - Sequencing Petterns - Game Programming Patterns</a>」にてわかりやすい絵付きで説明されています。
+アニメーションとかしないタイプの Roguelike なら「補間」は無視しても構いません。</p>
+
+<h2 id="行動を抽象化する">行動を抽象化する</h2>
+
+<p><code>Actor.update()</code> でそれぞれの actor 専用の行動を延々と書いていってもいいのですが、actor ができる行動の多くはどの actor にも共通ですので抽象化します。</p>
+
+<p>ゲーム内での行動を抽象化した <code>Action</code> クラスを用意し、<code>Actor</code> に次の行動を問い合わせるように変更しました。
+あと、actor の管理も別のクラスに分けて抽象化しておきます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> abc <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> deque
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Queue</span>(deque):
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;現在のアイテムを覚えていることができるキュー&#34;&#34;&#34;</span>
+    <span style="color:#a6e22e">@property</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">current</span>(self):
+        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">        現在のアイテム
+</span><span style="color:#e6db74">        リストが空なら None を返す。
+</span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+        <span style="color:#66d9ef">return</span> self[<span style="color:#ae81ff">0</span>] <span style="color:#66d9ef">if</span> self <span style="color:#66d9ef">else</span> None
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">proceed</span>(self, n<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>):
+        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;次のアイテムへ進める&#34;&#34;&#34;</span>
+        self<span style="color:#f92672">.</span>rotate(<span style="color:#f92672">-</span>n)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>get_next_action(world)
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># action を実行する</span>
+        action<span style="color:#f92672">.</span>perform(actor, world)
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_next_action</span>(self, world):
+        <span style="color:#66d9ef">return</span> None <span style="color:#75715e"># 状況に応じて何かの Action（か None）を返す</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Action</span>(ABC):
+    <span style="color:#a6e22e">@abstractmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">perform</span>(self, actor, world):
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">NotImplementedError</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Abstract base class &#39;Action&#39; must be inherited.&#34;</span>)</code></pre></div>
+<p><code>Action</code> は抽象基底クラスなので、継承して <code>perform</code> の実装をそれぞれの Action に応じて書く必要があります。</p>
+
+<p>これで様々な <code>Action</code> を好きな <code>Actor</code> にさせることができます。</p>
+
+<h2 id="ai-も抽象化して差し替え可能に">AI も抽象化して差し替え可能に</h2>
+
+<p><code>Actor.get_next_action()</code> に actor ごとの行動戦略を実装していけば AI の実装はできますが、それでは同じコードを何度もコピペしそうな嫌な予感がします。</p>
+
+<p>そこで、AI を抽象化した <code>Brain</code> クラスを用意して、そこに AI の実装を詰め込みます。
+そして、<code>Brain.decide_next_action()</code> が呼ばれたら与えられた actor の action キューに <code>Action</code> を積むようにします。</p>
+
+<p>メソッド名を変えたのは、<code>Brain.decide_next_action()</code> が直接 <code>Action</code> を返すのではなくキューに積むためです。
+こうすることでいくつかの <code>Action</code> を一連の行動としてキューに保存しておくことができます。</p>
+
+<p>また、player の AI 用に <code>DummyBrain</code> という、何も <code>Action</code> を積まないものも定義しています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, brain<span style="color:#f92672">=</span>None, actions<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>brain   <span style="color:#f92672">=</span> brain <span style="color:#f92672">or</span> DummyBrain()
+        self<span style="color:#f92672">.</span>actions <span style="color:#f92672">=</span> Queue(actions)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Brain</span>(ABC):
+    <span style="color:#a6e22e">@abstractmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decide_next_action</span>(self, actor, world):
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">NotImplementedError</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Abstract base class &#39;Brain&#39; must be inherited.&#34;</span>)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DummyBrain</span>(Brain):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decide_next_action</span>(self, actor, world):
+        <span style="color:#66d9ef">pass</span></code></pre></div>
+<p><code>World.update()</code> では <code>Actor.get_next_action()</code> ではなく actor の <code>Brain.decide_next_action()</code> を呼ぶようにします。
+この際、キューに <code>Action</code> が無いときだけ呼び出すようにしています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># action を実行する</span>
+        action<span style="color:#f92672">.</span>perform(actor, world)
+        
+        <span style="color:#75715e"># 次の action へ進める</span>
+        actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()</code></pre></div>
+<p>これで様々な AI を好きな <code>Actor</code> にさせることができます。</p>
+
+<h2 id="プレイヤーの入力を-actor-に注入する">プレイヤーの入力を actor に注入する</h2>
+
+<p>ここまで、プレイヤーと NPC は同じように扱ってきました。
+しかし、プレイヤーは AI の代わりにキーボードやマウス、ジョイパッドなどからの入力で動きます。</p>
+
+<p>これを実現するためにやるべきことは、プレイヤーの入力を <code>Action</code> に変換して actor に注入（injection）することです。</p>
+
+<p>プレイヤーの入力を注入する actor を覚えておくために、<code>World.player</code> プロパティを定義します。
+<code>World.player</code> は <code>World.actors</code> にも登録されるため、更新処理部分は全く手をつけなくて構いません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, player<span style="color:#f92672">=</span>None, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+        self<span style="color:#f92672">.</span>player <span style="color:#f92672">=</span> player
+    <span style="color:#a6e22e">@property</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">player</span>(self):
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>__player__
+    <span style="color:#a6e22e">@player.setter</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">player</span>(self, player):
+        <span style="color:#66d9ef">if</span> player <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
+            self<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>append(player)
+        self<span style="color:#f92672">.</span>__player__ <span style="color:#f92672">=</span> player</code></pre></div>
+<p>そして、プレイヤーの入力を <code>Action</code> にして <code>World.player</code> の action キューに追加します。
+ここではノン・ブロッキング IO のために curses を使っています。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> time
+<span style="color:#f92672">import</span> curses
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
+    MS_PER_UPDATE <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#66d9ef">def</span> __init__(self, stdscr, world<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>stdscr    <span style="color:#f92672">=</span> stdscr
+        self<span style="color:#f92672">.</span>world     <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
+        self<span style="color:#f92672">.</span>running   <span style="color:#f92672">=</span> False
+        self<span style="color:#f92672">.</span>_previous <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+        self<span style="color:#f92672">.</span>_lag      <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_input</span>(self):
+        player <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>player
+        
+        <span style="color:#75715e"># player の番なら</span>
+        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current <span style="color:#f92672">==</span> player:
+            key <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>stdscr<span style="color:#f92672">.</span>getkey()
+            
+            <span style="color:#75715e"># 入力によって Action を player に注入</span>
+            <span style="color:#66d9ef">if</span> key <span style="color:#f92672">==</span> curses<span style="color:#f92672">.</span>KEY_UP:
+                action <span style="color:#f92672">=</span> WalkAction(Direction<span style="color:#f92672">.</span>North)
+                player<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>append(action)
+            <span style="color:#66d9ef">elif</span> key <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;q&#39;</span>:
+                self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>(stdscr):
+    world <span style="color:#f92672">=</span> World(player<span style="color:#f92672">=</span>Actor())
+    Game(stdscr, world<span style="color:#f92672">=</span>world)<span style="color:#f92672">.</span>run()
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
+    curses<span style="color:#f92672">.</span>wrapper(main)</code></pre></div>
+<h2 id="メインループを勝手に弄れないとき">メインループを勝手に弄れないとき</h2>
+
+<p>ブラウザや一般的な GUI ライブラリでは、メインループはブラウザやライブラリ側が管理していて、アプリケーション側で定義することができないことが多々あります。
+そんなときは、アプリケーション側のメインループを別に定義して、入力があれば <code>Action</code> を actor に注入します。</p>
+
+<p>ブラウザの場合は <code>window.setInterval()</code> や <code>window.setTimeuot()</code> を使います。
+コードは ES 2017 です。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Keyboard</span> {
+    <span style="color:#a6e22e">constructor</span>(window) {
+        <span style="color:#66d9ef">this</span>.window     <span style="color:#f92672">=</span> window
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>       <span style="color:#f92672">=</span> {}
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+    }
+    <span style="color:#a6e22e">start</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
+            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+        }
+    }
+    <span style="color:#a6e22e">stop</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
+            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+        }
+    }
+    <span style="color:#a6e22e">on_keydown</span>(<span style="color:#a6e22e">event</span>) {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">event</span>
+    }
+    <span style="color:#a6e22e">on_keyup</span>(<span style="color:#a6e22e">event</span>) {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+    }
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span> {
+    <span style="color:#a6e22e">MS_PER_HANDLE_INPUT</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#a6e22e">MS_PER_UPDATE</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#a6e22e">MS_PER_DRAW</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#a6e22e">constructor</span>(window, <span style="color:#a6e22e">world</span><span style="color:#f92672">=</span><span style="color:#66d9ef">null</span>) {
+        <span style="color:#66d9ef">this</span>.window       <span style="color:#f92672">=</span> window
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">world</span>        <span style="color:#f92672">=</span> <span style="color:#a6e22e">world</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">World</span>()
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>     <span style="color:#f92672">=</span> <span style="color:#a6e22e">Keyboard</span>(<span style="color:#66d9ef">this</span>.window)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+    <span style="color:#a6e22e">run</span>() {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">start</span>()
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">handle_input</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_HANDLE_INPUT</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_UPDATE</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_DRAW</span>)
+    }
+    <span style="color:#a6e22e">pause</span>() {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">stop</span>()
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>)
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+    }
+    <span style="color:#a6e22e">handle_input</span>() {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">self</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">ArrowUp</span>) {
+            <span style="color:#a6e22e">action</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">WalkAction</span>(<span style="color:#a6e22e">Direction</span>.<span style="color:#a6e22e">North</span>)
+            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">world</span>.<span style="color:#a6e22e">player</span>.<span style="color:#a6e22e">actions</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">action</span>)
+        }
+    }
+}
+
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(window) {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">game</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Game</span>(window)
+    <span style="color:#a6e22e">game</span>.<span style="color:#a6e22e">run</span>()
+}
+
+;(<span style="color:#66d9ef">function</span>(window){
+    <span style="color:#a6e22e">main</span>(window)
+})(window);</code></pre></div>
+<p>「pyglet」なら <code>pyglet.clock.schedule_interval()</code> が使えます。
+他のライブラリでも同じような仕組みがあると思います。</p>
+
+<h2 id="ターン制ゲームにおけるスピードの実装">ターン制ゲームにおけるスピードの実装</h2>
+
+<p>さて、ここまでは「完全な」ターン制でしたが、あまりに完全なためにすべての actor が同じスピードで動いていました。
+これではつまらないので Angband の Energy を使った実装を参考に、actor ごとに異なるスピードを持てるように実装します。</p>
+
+<p>まず、<code>Actor.speed</code> と <code>Actor.energy</code> を定義します。
+各ターンごとに <code>Actor</code> はスピードに応じた量の Energy を得て、一定量以上の Energy が貯まれば行動できるようになります。</p>
+
+<p>移動できない方向へ移動しようとしたときなどに Energy を消費しないよう、<code>Action.perform()</code> は成功したかどうかを返すように変更します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, brain<span style="color:#f92672">=</span>None, speed<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, actions<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>brain   <span style="color:#f92672">=</span> brain <span style="color:#f92672">or</span> DummyBrain()
+        self<span style="color:#f92672">.</span>speed   <span style="color:#f92672">=</span> speed
+        self<span style="color:#f92672">.</span>energy  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+        self<span style="color:#f92672">.</span>actions <span style="color:#f92672">=</span> Queue(actions)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    ENERGY_COST <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+    <span style="color:#66d9ef">def</span> __init__(self, actors<span style="color:#f92672">=</span>[]):
+        self<span style="color:#f92672">.</span>actors <span style="color:#f92672">=</span> Queue(actors)
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に energy を与える</span>
+        actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
+        
+        <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
+            <span style="color:#75715e"># action を実行する</span>
+            succeeded <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>perform(actor, world)
+            
+            <span style="color:#66d9ef">if</span> succeeded:
+                <span style="color:#75715e"># energy を消費する</span>
+                actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>ENERGY_COST
+            
+            <span style="color:#75715e"># 次の action へ進める</span>
+            actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calc_energy</span>(self, speed):
+        <span style="color:#66d9ef">return</span> math<span style="color:#f92672">.</span>floor(math<span style="color:#f92672">.</span>erf(speed <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>)</code></pre></div>
+<p><code>Actor.speed</code> から 1ターンに得られる Energy を計算するのに誤差関数を使っています。
+誤差関数が何を意味する関数なのかは正直良く知りませんが、そのグラフの形は理想的です。
+ただ、重そうな処理なので Angband のように予めテーブルを定義する方式の方がいいのかもしれません。</p>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+    
+
+
+    
+
+    
+      <p><figure class="image center-image">
+        <blockquote class="image-quoted" cite="https://ja.wikipedia.org/wiki/%e8%aa%a4%e5%b7%ae%e9%96%a2%e6%95%b0">
+          <a data-lightbox="lightbox-group-default" href="https://upload.wikimedia.org/wikipedia/commons/2/2f/Error_Function.svg" data-title="誤差関数のグラフ&nbsp;from&nbsp;誤差関数 - Wikipedia">
+            <img class="image-data" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Error_Function.svg" alt="誤差関数のグラフ" title="誤差関数のグラフ" onerror="this.classList.add('on-error')" />
+            <span class="image-alt">Not found</span>
+          </a>
+        </blockquote>
+        
+          <div class="image-quoted-cite">from&nbsp;<a href="https://ja.wikipedia.org/wiki/%e8%aa%a4%e5%b7%ae%e9%96%a2%e6%95%b0"><cite>誤差関数 - Wikipedia</cite></a></div>
+        
+        <figcaption>
+          
+            <a href="https://commons.wikimedia.org/wiki/File:Error_Function.svg" target="_blank">誤差関数のグラフ</a>
+          
+        </figcaption>
+      </figure></p>
+    
+
+
+<h2 id="action-をもっと柔軟に">Action をもっと柔軟に</h2>
+
+<p>例えば、右キーを押したらプレイヤーが右に歩くとします。
+しかしその方向に扉があったら右に歩くのではなく扉を開けてほしいですし、その方向に他の actor がいたら会話したり攻撃したりしてほしいです。</p>
+
+<p>そのために <code>Action.perform()</code> の返り値として成功の可否と代わりに実行すべきアクションを返すようにします。
+また、複数ターンに渡って 1つの <code>Action</code> を実行できるように、実行が終了したかどうかも返すようにします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> NamedTuple, Optional
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ActionResult</span>(NamedTuple):
+    succeeded  : bool               <span style="color:#f92672">=</span> True
+    done       : bool               <span style="color:#f92672">=</span> True
+    alternative: Optional[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;Action&#39;</span>] <span style="color:#f92672">=</span> None</code></pre></div>
+<p>あとは <code>ActionResult.alternative</code> が <code>None</code> になるまで <code>Action</code> を実行したりなんだりかんだりします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">World</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
+        world <span style="color:#f92672">=</span> self
+        
+        <span style="color:#75715e"># actor を得る</span>
+        actor <span style="color:#f92672">=</span> world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
+            <span style="color:#66d9ef">return</span>
+        
+        action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+            <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
+            actor<span style="color:#f92672">.</span>brain<span style="color:#f92672">.</span>decide_next_action(actor, world)
+            action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
+                <span style="color:#66d9ef">return</span>
+        
+        <span style="color:#75715e"># actor に energy を与える</span>
+        actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
+        
+        <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
+            <span style="color:#75715e"># action を実行する</span>
+            <span style="color:#66d9ef">while</span> action:
+                result <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>perform(actor, world)
+                action <span style="color:#f92672">=</span> result<span style="color:#f92672">.</span>alternative
+            
+            <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>succeeded:
+                <span style="color:#75715e"># energy を消費する</span>
+                actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">-=</span> self<span style="color:#f92672">.</span>ENERGY_COST
+            
+            <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>done:
+                <span style="color:#75715e"># 次の action へ進める</span>
+                actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>proceed()
+        
+        <span style="color:#75715e"># 次の actor へ進める</span>
+        world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()</code></pre></div>
+<h2 id="まとめ">まとめ</h2>
+
+<p>本当は昨日公開するはずでしたが、こたつに「ねぇねぇ、いっしょにいようよぉ」とせがまれてしまい、こんなに時間がかかってしまいました。
+サンプルコードは実際のコードベースから抜き出して型アノテーションをなくしたりわかりやすくなるように手直ししたものなので、動かなかったらうまくがんばってください。</p>
+
+<p>Go で書こうとしたものの、グラフィックライブラリが貧弱だったので Python 3.6 + pyglet 1.3 で書いています。
+でも SFML の Go バインディングがあることに気づいて書きなおそうか迷っています。
+今更デスクトップゲームは流行らないかもしれないし、将来的にはブラウザでも動くようにしたいんですけども、まあとりあえず。</p>
+    </div>
+
+    
+    <aside id="social-share" class="post-aside">
+        <ul class="icons post-aside-content">
+            
+
+
+<li>
+  <a href="//twitter.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&text=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+    </a>
+</li>
+
+
+<li>
+  <a href="//plus.google.com/share?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//b.hatena.ne.jp/entry/kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/" target="_blank" class="share-btn hatena">
+    <i class="icon-hatena"></i>
+    <p>Hatena</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="https://getpocket.com/save?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn pocket">
+    <i class="fa fa-get-pocket"></i>
+    <p>Pocket</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//reddit.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn linkedin">
+      <i class="fa fa-linkedin"></i>
+      <p>LinkedIn</p>
+    </a>
+</li>
+
+
+<li>
+  <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&title=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f&description=%e3%83%ad%e3%83%bc%e3%82%b0%e3%83%a9%e3%82%a4%e3%82%af%e3%81%ae%e3%82%bf%e3%83%bc%e3%83%b3%e5%88%b6%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%ab%e3%83%bc%e3%83%97" target="_blank" class="share-btn pinterest">
+    <i class="fa fa-pinterest-p"></i>
+    <p>Pinterest</p>
+  </a>
+</li>
+
+
+<li>
+  <a href="mailto:?subject=Check out this post by Kuro%20Usada&body=http%3a%2f%2fkurousada.ga%2fposts%2ftech%2frl%2fa-turn-based-gameloop-for-roguelikes%2f" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+  </a>
+</li>
+
+        </ul>
+    </aside>
+    
+
+    
+    
+    
+
+    <footer class="content-footer">
+        <ul class="stats">
+    
+        
+
+        
+        
+            <li>
+                
+                
+                    
+
+                    
+
+                    
+
+                    
+                        Categories
+                    
+                
+            </li>
+        
+    
+
+    
+    
+        <li><a href='http://kurousada.ga/categories/tech'>tech</a></li>
+    
+        <li><a href='http://kurousada.ga/categories/rl'>RL</a></li>
+    
+        <li><a href='http://kurousada.ga/categories/python'>python</a></li>
+    
+        <li><a href='http://kurousada.ga/categories/js'>js</a></li>
+    
+</ul>
+
+        <section class="back-to-top-link">
+            <a href="#top"><i class="fa fa-arrow-up"></i>&nbsp;Back To Top</a>
+        </section>
+    </footer>
+</article>
+<ul class="actions pagination">
+    
+        <li><a href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/"
+                class="button big previous">Goを使ってDLLをクロスコンパイル on Linux</a></li>
+    
+
+    
+</ul>
+
+
+
+<aside id="comments">
+
+    
+        <article id="post-comments" class="post">
+            <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "kurousada-ga" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        </article>
+    
+
+</aside>
+
+
+
+
+
+
+
+<aside class="navi">
+<nav id="related-posts" class="navi-content">
+  
+    <ul class="posts">
+      <header>
+        <h3>Related Posts</h3>
+      </header>
+      
+        <li class="post">
+          <a class="post-link" href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/">
+            <article>
+              <header>
+                <h4 class="post-link-title">Goを使ってDLLをクロスコンパイル on Linux</h4>
+                <time class="published" datetime="2017-12-01">December 1, 2017</time>
+              </header>
+            </article>
+          </a>
+        </li>
+      
+        <li class="post">
+          <a class="post-link" href="http://kurousada.ga/posts/tech/how-to-get-back-old-times-offline/">
+            <article>
+              <header>
+                <h4 class="post-link-title">オフラインでも懐かしいあの頃に戻る方法</h4>
+                <time class="published" datetime="2017-10-31">October 31, 2017</time>
+              </header>
+            </article>
+          </a>
+        </li>
+      
+        <li class="post">
+          <a class="post-link" href="http://kurousada.ga/posts/tech/how-to-use-your-original-domain-for-free-with-github-pages/">
+            <article>
+              <header>
+                <h4 class="post-link-title">【無料】Github Pages で独自ドメインを使う</h4>
+                <time class="published" datetime="2017-10-30">October 30, 2017</time>
+              </header>
+            </article>
+          </a>
+        </li>
+      
+        <li class="post">
+          <a class="post-link" href="http://kurousada.ga/posts/tech/linux/how-to-create-login-themes-on-linux-mint/">
+            <article>
+              <header>
+                <h4 class="post-link-title">Linux Mintのログイン画面のテーマを自作する</h4>
+                <time class="published" datetime="2017-10-29">October 29, 2017</time>
+              </header>
+            </article>
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+</aside>
+
+
+
+
+    </div>
+    
+<section id="sidebar" class="navi">
+
+    
+        <section id="intro">
+            
+            
+                
+                    <a href="http://kurousada.ga/" class="logo"><img src="http://kurousada.ga/img/main/logo.png" alt="Kuro Usada" /></a>
+                
+            
+            
+                <header>
+                    <h2>Kuro Usada ga!</h2>
+                    <p>Kuro Usadaが楽しく遊ぶところです。<br>エサをあげると喜びます。</p>
+                </header>
+            
+            <ul class="icons">
+                
+                
+                    
+  <li><a href="//github.com/kurousada" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="mailto:kuro.usada&#43;email@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+
+
+                
+            </ul>
+        </section>
+
+    
+        <section id="recent-posts" class="navi-content">
+            <ul class="posts">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                
+                    
+                
+
+                
+                    
+                
+
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ローグライクのターン制ゲームループ</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2018-01-02'>
+                                    January 2, 2018</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/tech/cross-compile-dll-using-golang-on-linux/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">Goを使ってDLLをクロスコンパイル on Linux</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2017-12-01'>
+                                    December 1, 2017</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/disney/tds/eat-them-in-tokyo-disney-sea/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ディズニーシーではこれを食え！</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2017-11-03'>
+                                    November 3, 2017</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/disney/tds/drink-them-in-tokyo-disney-sea/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ディズニーシーではこれを飲め！</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2017-11-08'>
+                                    November 8, 2017</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/posts/disney/disney-food-dogma/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ディズニー・フードの鉄則</h4>
+                                
+                                    
+                                        
+                                    
+                                
+                                <time class="published" datetime=
+                                    '2017-11-01'>
+                                    November 1, 2017</time>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+
+                
+                    <li class="post more-post">
+                        <ul class="actions">
+                            <li><a href=
+                            
+                                /posts/
+                            
+                            class="button">View more posts</a></li>
+                        </ul>
+                    </li>
+                
+            </ul>
+        </section>
+
+    
+    
+    
+    
+        <section id="categories" class="navi-content">
+            <ul class="posts">
+                <header>
+                    <h3><a href="http://kurousada.ga/categories/">Categories</a></h3>
+                </header>
+
+                
+                    
+                
+
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/disney/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">Disney</h4>
+                                <span style="float:right;">6</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/tds/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">TDS</h4>
+                                <span style="float:right;">6</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/tech/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">tech</h4>
+                                <span style="float:right;">5</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/food/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">food</h4>
+                                <span style="float:right;">3</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/linux/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">Linux</h4>
+                                <span style="float:right;">2</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/tdl/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">TDL</h4>
+                                <span style="float:right;">2</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/favorites/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">favorites</h4>
+                                <span style="float:right;">2</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/narcissu/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">narcissu</h4>
+                                <span style="float:right;">2</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/linux-mint/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">Linux Mint</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/rl/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">RL</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/eva/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">eva</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/github/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">github</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/gits/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">gits</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/golang/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">golang</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/js/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">js</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/python/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">python</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+                    <li class="post">
+                      <a class="post-link" href="http://kurousada.ga/categories/ukagaka/">
+                        <article>
+                            <header>
+                                <h4 class="post-link-title">ukagaka</h4>
+                                <span style="float:right;">1</span>
+                            </header>
+                        </article>
+                      </a>
+                    </li>
+                
+            </ul>
+        </section>
+    
+
+    
+        
+        <section id="intro-about" class="blurb" class="navi-content">
+            <header>
+              <h2>About</h2>
+            </header>
+            <p class="navi-content-content">Ladies and gentlemen, boys and girls. Kuro Usada ga! presented by Kuro Usada has began just a few months ago.　Every time, Kuro Usada uses his vivid imagination to create magical imagery for all to enjoy. Nothing is more wonderful than the imagination. It can be a beautiful fantasy. Or, an exciting adventure! But beware — imagination also expand your greatest fears into a nightmare. Now, get ready for a journey beyond your wildest imagination...</p>
+
+            <ul class="actions">
+                <li><a href="http://kurousada.ga/about/" class="button">Learn More</a></li>
+            </ul>
+        </section>
+        
+
+    
+        
+        
+        
+
+    
+        <section id="footer">
+            <p class="notice">Check our <a href="privacy-policy">Privacy Policy</a>.</p>
+            <p class="notice">This web site works best on the latest version of <a href="vivaldi.com">Vivaldi</a> for Linux.</p>
+            <ul class="icons">
+                
+                
+                    
+  <li><a href="//github.com/kurousada" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="mailto:kuro.usada&#43;email@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+
+
+                
+            </ul>
+
+            <p class="copyright">&copy; Kuro Usada ga! by Kuro Usada. Designed by <a href="http://html5up.net" target="_blank">HTML5 UP</a>, Ported by <a href="//github.com/jpescador" target="_blank">Julio Pescador</a>. Powered by <a href="//gohugo.io" target="_blank">Hugo</a></p>
+        </section>
+
+</section>
+
+            </div>
+        
+        
+
+        
+        
+        
+        
+            
+        
+
+        
+        
+
+        
+            
+            
+                
+                    <script src="http://kurousada.ga/js/site.min.js"></script>
+                
+            
+            
+        
+
+        
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        
+        <script>
+          window.addEventListener( 'load', function () {
+            (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-2419792064448421",
+              enable_page_level_ads: true
+            });
+            Array.prototype.forEach.call( document.querySelectorAll( "a[href^='http']:not([href*='" + location.hostname + "'])" ), function( el ){
+              el.setAttribute( 'target', '_blank' )
+            } );
+            if ( lightbox ) {
+              const marginTop = 15
+              const header = document.querySelector( '#header' )
+              const headerHeight = parseInt( window.getComputedStyle( header, '' ).height.slice( 0, -2 ), 10 )
+              const lightboxPosFromTop = headerHeight + marginTop
+              lightbox.option({
+                "alwaysShowNavOnTouchDevices": true,
+                "fitImagesInViewport": true,
+                "positionFromTop": lightboxPosFromTop,
+                "wrapAround": true
+              })
+            }
+            if ( hljs ) {
+              hljs.initHighlightingOnLoad();
+            }
+          }, false)
+        </script>
+        
+    </body>
+</html>
+
