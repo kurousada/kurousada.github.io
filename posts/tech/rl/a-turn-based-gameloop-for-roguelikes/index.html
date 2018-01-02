@@ -5,7 +5,9 @@
         
             
             
-                <title>ローグライクのターン制ゲームループ - Kuro Usada ga!</title>
+                
+                    <title>ローグライクのターン制ゲームループ - Kuro Usada ga!</title>
+                
             
         
 
@@ -53,7 +55,7 @@
 
 <meta itemprop="datePublished" content="2018-01-02T23:19:16&#43;09:00" />
 <meta itemprop="dateModified" content="2018-01-02T23:19:16&#43;09:00" />
-<meta itemprop="wordCount" content="5558">
+<meta itemprop="wordCount" content="6080">
 
 
 
@@ -357,7 +359,7 @@ ga('send', 'pageview');
         
         <span class="author">Kuro Usada</span>
         
-            <p>12 minute read</p>
+            <p>13 minute read</p>
         
         
     </div>
@@ -488,7 +490,7 @@ Nystrom さんの本やブログは必見の価値有りです（本も Web で�
 元になった Rogue は様々な特徴を持っていたので、どんなゲームが Roguelike なのかという定義については議論の余地があります。
 詳しくは「<a href="http://2dgames.jp/2015/03/19/roguelike/">ローグライクの定義まとめ – 2dgames.jp</a>」を参照してください。</p>
 
-<p>一言で言うと「やったことないなら、やってくさだい」です。</p>
+<p>一言で言うと「やったことないなら、やってください」です。</p>
 
 <h2 id="ゲームループの実装方針">ゲームループの実装方針</h2>
 
@@ -514,8 +516,10 @@ Nystrom さんの本やブログは必見の価値有りです（本も Web で�
 <p>今回作っているローグライクは、コンソールベースではなく Elona のような GUI にしたいと考えていました。
 しかし昔ながらのコンソールも捨てがたいし……というわけで、ロジックと UI を分離します。</p>
 
-<p>コンソールベースの UI は curses 一択ですが、GUI ライブラリは「SDL」「SFML」「OpenGL」などいくらでもあり、選択に迷います。
-ロジックと UI を分離することで、UI 部分が依存する GUI ライブラリのメンテナンスが止まっても労力が少なくて済みます。</p>
+<p>コンソールベースの UI は「curses」や「BearLibTerminal」、GUI ライブラリは「SDL」「SFML」「OpenGL」などいくらでもあり、選択に迷います。
+ロジックと UI を分離することで、UI 部分が依存する GUI ライブラリのメンテナンスが止まっても移植する労力が少なくて済みます。</p>
+
+<p>また、毎年「7DRL」という、7日間で Roguelike を作るというイベントがあるのですが、ロジックと UI を分離してライブラリにしておけばより簡単に作ることができます。</p>
 
 <h3 id="npc-の-ai-は差し替え可能にする">NPC の AI は差し替え可能にする</h3>
 
@@ -526,7 +530,10 @@ NPC をペットとして動かすことができるようにしたいのです�
 
 <p>今書いているのが Python 3.6 なので、サンプルは Python 3.6 で書きます（実際のコードとは異なります）。</p>
 
-<p>さて、まずはよくあるゲームループを見てみましょう（ブラウザは特殊なので、対応はもう少し先です）。</p>
+<p>さて、まずはよくあるゲームループを見てみましょう。
+これを基にどんどん書き換えていきます。</p>
+
+<p>なお、ブラウザの話は少し特殊なので、もう少し先で出てきます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
         <span style="color:#66d9ef">pass</span>
@@ -543,6 +550,8 @@ NPC をペットとして動かすことができるようにしたいのです�
             self<span style="color:#f92672">.</span>handle_input()
             self<span style="color:#f92672">.</span>update()
             self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">quit</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
         <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
             actor<span style="color:#f92672">.</span>update()
@@ -551,11 +560,12 @@ NPC をペットとして動かすことができるようにしたいのです�
             actor<span style="color:#f92672">.</span>draw()
 
 <span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
-    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+    game <span style="color:#f92672">=</span> Game()
+    game<span style="color:#f92672">.</span>run()</code></pre></div>
 <p>このゲームループではゲームのロジックと UI の分離があまりなされていません。
 <code>Actor</code> クラスがゲームロジックも描画も司っています。</p>
 
-<p>そこで、<code>Game</code> オブジェクトからゲームロジックを担当する <code>World</code> クラスを切り出します。
+<p>そこで、<code>Actor</code> クラスを <code>Actor</code> と <code>Sprite</code> に分け、<code>Game</code> クラスからゲームロジックを担当する <code>World</code> クラスを切り出します。
 そしてこの <code>World</code> クラスを <code>Game</code> クラスが持つようにし、UI から <code>World</code> の更新を進めるようにします。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Sprite</span>:
     <span style="color:#66d9ef">def</span> __init__(self, actor):
@@ -578,6 +588,8 @@ NPC をペットとして動かすことができるようにしたいのです�
             self<span style="color:#f92672">.</span>handle_input()
             self<span style="color:#f92672">.</span>update()
             self<span style="color:#f92672">.</span>draw()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">quit</span>(self):
+        self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(self):
         self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>update()
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
@@ -593,7 +605,8 @@ NPC をペットとして動かすことができるようにしたいのです�
             actor<span style="color:#f92672">.</span>update()
 
 <span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
-    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+    game <span style="color:#f92672">=</span> Game()
+    game<span style="color:#f92672">.</span>run()</code></pre></div>
 <h2 id="更新と描画を非同期っぽくする">更新と描画を非同期っぽくする</h2>
 
 <p><code>World.update()</code> ではすべての actor を一度に処理していました。
@@ -638,10 +651,7 @@ NPC をペットとして動かすことができるようにしたいのです�
             <span style="color:#75715e"># 1つの actor だけ処理する</span>
             actor <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>actors[self<span style="color:#f92672">.</span>_current_actor]
             actor<span style="color:#f92672">.</span>update()
-            self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> (self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> len(self<span style="color:#f92672">.</span>actors)
-
-<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;__main__&#39;</span>:
-    Game()<span style="color:#f92672">.</span>run()</code></pre></div>
+            self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">=</span> (self<span style="color:#f92672">.</span>_current_actor <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> len(self<span style="color:#f92672">.</span>actors)</code></pre></div>
 <p>これで更新処理と描画処理が非同期っぽくなり、更新処理の方はできるだけ多く呼ばれつつ、一定時間ごとに描画処理が呼ばれるようになりました。
 なお、描画関数に引数が渡されているのは更新が途中でも描画関数が呼び出されるためで、この引数「補間（interpolation）」を基にして各オブジェクトの位置を決めたりします。
 詳しくは「<a href="http://gameprogrammingpatterns.com/gameloop.html">Game Loop - Sequencing Petterns - Game Programming Patterns</a>」にてわかりやすい絵付きで説明されています。
@@ -708,12 +718,13 @@ NPC をペットとして動かすことができるようにしたいのです�
 <p><code>Actor.get_next_action()</code> に actor ごとの行動戦略を実装していけば AI の実装はできますが、それでは同じコードを何度もコピペしそうな嫌な予感がします。</p>
 
 <p>そこで、AI を抽象化した <code>Brain</code> クラスを用意して、そこに AI の実装を詰め込みます。
-そして、<code>Brain.decide_next_action()</code> が呼ばれたら与えられた actor の action キューに <code>Action</code> を積むようにします。</p>
+そして、<code>Brain.decide_next_action()</code> が呼ばれたら与えられた actor の action キューに <code>Action</code> を積むようにします。
+<code>Actor.get_next_action()</code> はお役御免です。</p>
 
 <p>メソッド名を変えたのは、<code>Brain.decide_next_action()</code> が直接 <code>Action</code> を返すのではなくキューに積むためです。
-こうすることでいくつかの <code>Action</code> を一連の行動としてキューに保存しておくことができます。</p>
+こうすることでいくつかの <code>Action</code> を一連の行動としてキューに追加することができます。</p>
 
-<p>また、player の AI 用に <code>DummyBrain</code> という、何も <code>Action</code> を積まないものも定義しています。</p>
+<p>また、プレイヤーの AI 用に <code>DummyBrain</code> という、何も <code>Action</code> を積まないものも定義しています。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
     <span style="color:#66d9ef">def</span> __init__(self, brain<span style="color:#f92672">=</span>None, actions<span style="color:#f92672">=</span>[]):
         self<span style="color:#f92672">.</span>brain   <span style="color:#f92672">=</span> brain <span style="color:#f92672">or</span> DummyBrain()
@@ -740,6 +751,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
             <span style="color:#66d9ef">return</span>
         
+        <span style="color:#75715e"># action を得る</span>
         action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
             <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
@@ -779,13 +791,12 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#66d9ef">if</span> player <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>actors:
             self<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>append(player)
         self<span style="color:#f92672">.</span>__player__ <span style="color:#f92672">=</span> player</code></pre></div>
-<p>そして、プレイヤーの入力を <code>Action</code> にして <code>World.player</code> の action キューに追加します。
+<p>そして、プレイヤーの入力を基に <code>Action</code> を <code>World.player</code> の action キューに追加します。
 ここではノン・ブロッキング IO のために curses を使っています。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> time
 <span style="color:#f92672">import</span> curses
 
 <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span>:
-    MS_PER_UPDATE <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
     <span style="color:#66d9ef">def</span> __init__(self, stdscr, world<span style="color:#f92672">=</span>None):
         self<span style="color:#f92672">.</span>stdscr    <span style="color:#f92672">=</span> stdscr
         self<span style="color:#f92672">.</span>world     <span style="color:#f92672">=</span> world <span style="color:#f92672">or</span> World()
@@ -795,16 +806,16 @@ NPC をペットとして動かすことができるようにしたいのです�
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_input</span>(self):
         player <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>player
         
-        <span style="color:#75715e"># player の番なら</span>
+        <span style="color:#75715e"># プレイヤーの番なら</span>
         <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>current <span style="color:#f92672">==</span> player:
             key <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>stdscr<span style="color:#f92672">.</span>getkey()
             
-            <span style="color:#75715e"># 入力によって Action を player に注入</span>
+            <span style="color:#75715e"># 入力を基に Action をプレイヤーに注入</span>
             <span style="color:#66d9ef">if</span> key <span style="color:#f92672">==</span> curses<span style="color:#f92672">.</span>KEY_UP:
                 action <span style="color:#f92672">=</span> WalkAction(Direction<span style="color:#f92672">.</span>North)
                 player<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>append(action)
             <span style="color:#66d9ef">elif</span> key <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;q&#39;</span>:
-                self<span style="color:#f92672">.</span>running <span style="color:#f92672">=</span> False
+                self<span style="color:#f92672">.</span>quit()
 
 <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>(stdscr):
     world <span style="color:#f92672">=</span> World(player<span style="color:#f92672">=</span>Actor())
@@ -818,36 +829,36 @@ NPC をペットとして動かすことができるようにしたいのです�
 そんなときは、アプリケーション側のメインループを別に定義して、入力があれば <code>Action</code> を actor に注入します。</p>
 
 <p>ブラウザの場合は <code>window.setInterval()</code> や <code>window.setTimeuot()</code> を使います。
-コードは ES 2017 です。</p>
+<code>async</code> / <code>await</code> を使って同期っぽく書くこともできますが、折角タイマーが用意されているのですから利用させてもらったほうがいいでしょう。</p>
+
+<p>ここのコードだけは ES 2017 です。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Keyboard</span> {
+    <span style="color:#75715e">/* キーボードイベントを監視して、キーボードの状態を確認しやすくするクラスです。
+</span><span style="color:#75715e">     * キーが押されていれば、Keyboard.keys.キー名 に KeyboardEvent オブジェクトが入ります。
+</span><span style="color:#75715e">     */</span>
     <span style="color:#a6e22e">constructor</span>(window) {
         <span style="color:#66d9ef">this</span>.window     <span style="color:#f92672">=</span> window
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>       <span style="color:#f92672">=</span> {}
-        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
     }
     <span style="color:#a6e22e">start</span>() {
-        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
-            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
-            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-        }
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keydown&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keydown</span>)
     }
     <span style="color:#a6e22e">stop</span>() {
-        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span>) {
-            <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
-            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">__paused__</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-        }
-    }
-    <span style="color:#a6e22e">on_keydown</span>(<span style="color:#a6e22e">event</span>) {
-        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">event</span>
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;keyup&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keyup</span>)
+        <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;keydown&#39;</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">on_keydown</span>)
     }
     <span style="color:#a6e22e">on_keyup</span>(<span style="color:#a6e22e">event</span>) {
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>
+    }
+    <span style="color:#a6e22e">on_keydown</span>(<span style="color:#a6e22e">event</span>) {
+        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">event</span>
     }
 }
 
 <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Game</span> {
     <span style="color:#a6e22e">MS_PER_HANDLE_INPUT</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
-    <span style="color:#a6e22e">MS_PER_UPDATE</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+    <span style="color:#a6e22e">MS_PER_UPDATE</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
     <span style="color:#a6e22e">MS_PER_DRAW</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
     <span style="color:#a6e22e">constructor</span>(window, <span style="color:#a6e22e">world</span><span style="color:#f92672">=</span><span style="color:#66d9ef">null</span>) {
         <span style="color:#66d9ef">this</span>.window       <span style="color:#f92672">=</span> window
@@ -865,7 +876,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update_timer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">update</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_UPDATE</span>)
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw_timer</span>   <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">draw</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">MS_PER_DRAW</span>)
     }
-    <span style="color:#a6e22e">pause</span>() {
+    <span style="color:#a6e22e">quit</span>() {
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">running</span>      <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
         <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">keyboard</span>.<span style="color:#a6e22e">stop</span>()
         <span style="color:#66d9ef">this</span>.window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">input_timer</span>)
@@ -897,10 +908,10 @@ NPC をペットとして動かすことができるようにしたいのです�
 <h2 id="ターン制ゲームにおけるスピードの実装">ターン制ゲームにおけるスピードの実装</h2>
 
 <p>さて、ここまでは「完全な」ターン制でしたが、あまりに完全なためにすべての actor が同じスピードで動いていました。
-これではつまらないので Angband の Energy を使った実装を参考に、actor ごとに異なるスピードを持てるように実装します。</p>
+これではつまらないので Angband の Energy を使った実装を参考に、actor ごとに異なるスピードを持てるようにします。</p>
 
 <p>まず、<code>Actor.speed</code> と <code>Actor.energy</code> を定義します。
-各ターンごとに <code>Actor</code> はスピードに応じた量の Energy を得て、一定量以上の Energy が貯まれば行動できるようになります。</p>
+<code>Actor</code> は各ターンごとにスピードに応じた量の Energy を得て、一定量以上の Energy が貯まれば行動できるようになります。</p>
 
 <p>移動できない方向へ移動しようとしたときなどに Energy を消費しないよう、<code>Action.perform()</code> は成功したかどうかを返すように変更します。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Actor</span>:
@@ -922,6 +933,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
             <span style="color:#66d9ef">return</span>
         
+        <span style="color:#75715e"># action を得る</span>
         action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
             <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
@@ -933,6 +945,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#75715e"># actor に energy を与える</span>
         actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
         
+        <span style="color:#75715e"># 十分 energy があるなら行動可能</span>
         <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
             <span style="color:#75715e"># action を実行する</span>
             succeeded <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>perform(actor, world)
@@ -948,7 +961,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calc_energy</span>(self, speed):
         <span style="color:#66d9ef">return</span> math<span style="color:#f92672">.</span>floor(math<span style="color:#f92672">.</span>erf(speed <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>)</code></pre></div>
-<p><code>Actor.speed</code> から 1ターンに得られる Energy を計算するのに誤差関数を使っています。
+<p><code>Actor.speed</code> から 1ターンごとに得られる Energy を計算するのに誤差関数を使っています。
 誤差関数が何を意味する関数なのかは正直良く知りませんが、そのグラフの形は理想的です。
 ただ、重そうな処理なので Angband のように予めテーブルを定義する方式の方がいいのかもしれません。</p>
 
@@ -1009,7 +1022,7 @@ NPC をペットとして動かすことができるようにしたいのです�
 <p>例えば、右キーを押したらプレイヤーが右に歩くとします。
 しかしその方向に扉があったら右に歩くのではなく扉を開けてほしいですし、その方向に他の actor がいたら会話したり攻撃したりしてほしいです。</p>
 
-<p>そのために <code>Action.perform()</code> の返り値として成功の可否と代わりに実行すべきアクションを返すようにします。
+<p>これを実現するために <code>Action.perform()</code> の返り値として成功の可否だけでなく、代わりに実行すべきアクションも返すようにします。
 また、複数ターンに渡って 1つの <code>Action</code> を実行できるように、実行が終了したかどうかも返すようにします。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> NamedTuple, Optional
 
@@ -1027,6 +1040,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> actor:
             <span style="color:#66d9ef">return</span>
         
+        <span style="color:#75715e"># action を得る</span>
         action <span style="color:#f92672">=</span> actor<span style="color:#f92672">.</span>actions<span style="color:#f92672">.</span>current
         <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> action:
             <span style="color:#75715e"># actor に次の行動を問い合わせる</span>
@@ -1038,6 +1052,7 @@ NPC をペットとして動かすことができるようにしたいのです�
         <span style="color:#75715e"># actor に energy を与える</span>
         actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">+=</span> world<span style="color:#f92672">.</span>calc_energy(actor<span style="color:#f92672">.</span>speed)
         
+        <span style="color:#75715e"># 十分 energy があるなら行動可能</span>
         <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>energy <span style="color:#f92672">&gt;=</span> self<span style="color:#f92672">.</span>ENERGY_COST:
             <span style="color:#75715e"># action を実行する</span>
             <span style="color:#66d9ef">while</span> action:
@@ -1054,13 +1069,46 @@ NPC をペットとして動かすことができるようにしたいのです�
         
         <span style="color:#75715e"># 次の actor へ進める</span>
         world<span style="color:#f92672">.</span>actors<span style="color:#f92672">.</span>proceed()</code></pre></div>
+<p>「歩く」という行動を表す <code>WalkAction</code> はこんな感じになります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WalkAction</span>(Action):
+    <span style="color:#66d9ef">def</span> __init__(self, direction):
+        super<span style="color:#f92672">.</span>__init__()
+        self<span style="color:#f92672">.</span>direction <span style="color:#f92672">=</span> direction
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">perform</span>(self, action, world):
+        from_position <span style="color:#f92672">=</span> action<span style="color:#f92672">.</span>position
+        difference    <span style="color:#f92672">=</span> Direction<span style="color:#f92672">.</span>to_difference(self<span style="color:#f92672">.</span>direction)
+        to_position   <span style="color:#f92672">=</span> from_position <span style="color:#f92672">+</span> difference
+        
+        <span style="color:#75715e"># actor が direction を向くようにする</span>
+        actor<span style="color:#f92672">.</span>face <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>direction
+        
+        <span style="color:#75715e"># to_position に actor がいるか確認する</span>
+        neighbors <span style="color:#f92672">=</span> [actor <span style="color:#66d9ef">for</span> actor <span style="color:#f92672">in</span> world<span style="color:#f92672">.</span>actors <span style="color:#66d9ef">if</span> actor<span style="color:#f92672">.</span>position <span style="color:#f92672">==</span> to_position]
+        <span style="color:#66d9ef">if</span> neighbors:
+            <span style="color:#75715e"># いれば攻撃</span>
+            <span style="color:#66d9ef">return</span> ActionResult(succeeded<span style="color:#f92672">=</span>False, done<span style="color:#f92672">=</span>False, alternative<span style="color:#f92672">=</span>AttackAction(targets<span style="color:#f92672">=</span>neighbors))
+        
+        <span style="color:#75715e"># to_position に 閉じた扉があるか確認する</span>
+        doors <span style="color:#f92672">=</span> [tile <span style="color:#66d9ef">for</span> tile <span style="color:#f92672">in</span> world<span style="color:#f92672">.</span>fields<span style="color:#f92672">.</span>current<span style="color:#f92672">.</span>get_at(to_position) <span style="color:#66d9ef">if</span> isinstance(tile, DoorTile) <span style="color:#f92672">and</span> tile<span style="color:#f92672">.</span>closed]
+        <span style="color:#66d9ef">if</span> doors:
+            <span style="color:#75715e"># あれば開く</span>
+            <span style="color:#66d9ef">return</span> ActionResult(succeeded<span style="color:#f92672">=</span>False, done<span style="color:#f92672">=</span>False, alternative<span style="color:#f92672">=</span>OpenDoorAction(doors<span style="color:#f92672">=</span>doors))
+        
+        <span style="color:#75715e"># to_position に移動できるか（壁がないかなど）確認する</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> world<span style="color:#f92672">.</span>fields<span style="color:#f92672">.</span>current<span style="color:#f92672">.</span>movable_to(self<span style="color:#f92672">.</span>direction, to_position):
+            <span style="color:#66d9ef">return</span> ActionResult(succeeded<span style="color:#f92672">=</span>False)
+        
+        <span style="color:#75715e"># 移動する</span>
+        actor<span style="color:#f92672">.</span>position <span style="color:#f92672">=</span> to_position
+        
+        <span style="color:#66d9ef">return</span> ActionReult(succeeded<span style="color:#f92672">=</span>True)</code></pre></div>
 <h2 id="まとめ">まとめ</h2>
 
 <p>本当は昨日公開するはずでしたが、こたつに「ねぇねぇ、いっしょにいようよぉ」とせがまれてしまい、こんなに時間がかかってしまいました。
 サンプルコードは実際のコードベースから抜き出して型アノテーションをなくしたりわかりやすくなるように手直ししたものなので、動かなかったらうまくがんばってください。</p>
 
-<p>Go で書こうとしたものの、グラフィックライブラリが貧弱だったので Python 3.6 + pyglet 1.3 で書いています。
-でも SFML の Go バインディングがあることに気づいて書きなおそうか迷っています。
+<p>Go で書こうとしたものの、いいグラフィックライブラリが見つからず Python 3.6 + pyglet 1.3 で書いています。
+でも SFML の Go バインディングがあることに気づいたので書きなおそうか迷っています。
 今更デスクトップゲームは流行らないかもしれないし、将来的にはブラウザでも動くようにしたいんですけども、まあとりあえず。</p>
     </div>
 
