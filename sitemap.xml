@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://kurousada.ga/posts/favorites/a-disney-mania-visited-sanrio-puroland/</loc>
+    <lastmod>2018-08-14T16:51:33+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://kurousada.ga/posts/tech/rl/a-turn-based-gameloop-for-roguelikes/</loc>
     <lastmod>2018-01-02T23:19:16+09:00</lastmod>
   </url>
@@ -132,7 +137,7 @@
   
   <url>
     <loc>http://kurousada.ga/</loc>
-    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+    <lastmod>2018-08-14T16:51:33+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -156,7 +161,13 @@
   
   <url>
     <loc>http://kurousada.ga/posts/</loc>
-    <lastmod>2018-01-02T23:19:16+09:00</lastmod>
+    <lastmod>2018-08-14T16:51:33+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://kurousada.ga/categories/puroland/</loc>
+    <lastmod>2018-08-14T16:51:33+09:00</lastmod>
     <priority>0</priority>
   </url>
   
